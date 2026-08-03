@@ -389,6 +389,8 @@ Route::middleware('auth')->group(function () {
  */
 Route::middleware([
     'auth',
+    'active',
+    EnsurePasswordIsChanged::class,
     'role:Admin',
 ])
     ->prefix('admin/laporan')
@@ -455,6 +457,8 @@ Route::middleware([
  */
 Route::middleware([
     'auth',
+    'active',
+    EnsurePasswordIsChanged::class,
     'role:Pimpinan',
 ])
     ->prefix('pimpinan/laporan')
@@ -527,6 +531,8 @@ Route::middleware([
 */
 Route::middleware([
     'auth',
+    'active',
+    EnsurePasswordIsChanged::class,
     'role:Pimpinan',
 ])
     ->prefix('pimpinan/tugas')
@@ -588,6 +594,8 @@ Route::middleware([
  */
 Route::middleware([
     'auth',
+    'active',
+    EnsurePasswordIsChanged::class,
     'role:Admin',
 ])
     ->get(
@@ -604,6 +612,8 @@ Route::middleware([
  */
 Route::middleware([
     'auth',
+    'active',
+    EnsurePasswordIsChanged::class,
     'role:Pimpinan',
 ])
     ->get(
@@ -623,7 +633,11 @@ Route::middleware([
 | Route ini dapat digunakan oleh seluruh pengguna yang login.
 |
 */
-Route::middleware('auth')
+Route::middleware([
+    'auth',
+    'active',
+    EnsurePasswordIsChanged::class,
+])
     ->prefix('notifikasi')
     ->name('notifications.')
     ->group(function () {
