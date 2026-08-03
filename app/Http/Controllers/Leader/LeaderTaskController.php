@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Leader;
 
 use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
+use App\Models\AppNotification;
 use App\Models\WorkItem;
 use App\Models\WorkReport;
 use App\Models\WfhScheduleMember;
@@ -265,6 +266,64 @@ class LeaderTaskController extends Controller
                 'continue_offline' => false,
                 'assigned_at' => now('Asia/Jakarta'),
             ]);
+            /*
+ * =====================================================
+ * NOTIFIKASI TUGAS BARU
+ * =====================================================
+ *
+ * Setelah tugas berhasil dibuat, sistem mengirimkan
+ * notifikasi kepada Personel penerima tugas.
+ */
+AppNotification::create([
+    /*
+     * Notifikasi dikirim kepada user yang terdaftar
+     * sebagai anggota jadwal WFH.
+     */
+    'user_id' => $member->user_id,
+
+    /*
+     * Jenis notifikasi digunakan untuk menentukan
+     * warna dan tujuan notifikasi.
+     */
+    'type' => 'leader_task',
+
+    /*
+     * Judul singkat yang tampil pada pusat notifikasi.
+     */
+    'title' => 'Tugas Baru dari Pimpinan',
+
+    /*
+     * Isi pesan notifikasi.
+     */
+    'message' =>
+        'Anda menerima tugas baru dari '
+        . $request->user()->name
+        . ': '
+        . $task->title
+        . '.',
+
+    /*
+     * Notifikasi dihubungkan dengan tugas yang
+     * baru dibuat.
+     */
+    'related_type' => WorkItem::class,
+    'related_id' => $task->id,
+
+    /*
+     * Notifikasi pertama kali berstatus belum dibaca.
+     */
+    'is_read' => false,
+    'read_at' => null,
+]);
+
+/*
+ * Laporan tetap dibuka agar tugas dapat
+ * dikerjakan oleh Personel.
+ */
+$report->forceFill([
+    'status' => 'draft',
+    'is_locked' => false,
+])->save();
 
             /*
              * Laporan tetap dibuka agar tugas dapat

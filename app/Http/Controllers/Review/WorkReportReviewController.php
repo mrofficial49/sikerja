@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Review;
 
 use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
+use App\Models\AppNotification;
 use App\Models\Unit;
 use App\Models\WorkItem;
 use App\Models\WorkItemFile;
@@ -357,6 +358,26 @@ class WorkReportReviewController extends Controller
                     : null,
             ])->save();
 
+            $person = $workReport
+    ->scheduleMember
+    ?->user;
+
+if ($person) {
+    AppNotification::create([
+        'user_id' => $person->id,
+        'type' => 'work_report_approved',
+        'title' => 'Laporan WFH Disetujui',
+
+        'message' =>
+            'Laporan WFH Anda telah diperiksa dan disetujui.',
+
+        'related_type' => WorkReport::class,
+        'related_id' => $lockedReport->id,
+        'is_read' => false,
+        'read_at' => null,
+    ]);
+}
+
             /*
              * Menyimpan aktivitas persetujuan
              * ke activity_logs.
@@ -475,6 +496,29 @@ class WorkReportReviewController extends Controller
                         $validated['verification_note']
                     ),
             ])->save();
+
+            $person = $workReport
+    ->scheduleMember
+    ?->user;
+
+if ($person) {
+    AppNotification::create([
+        'user_id' => $person->id,
+        'type' => 'work_report_revision',
+        'title' => 'Laporan WFH Perlu Revisi',
+
+        'message' =>
+            'Laporan WFH perlu diperbaiki. Catatan: '
+            . trim(
+                $validated['verification_note']
+            ),
+
+        'related_type' => WorkReport::class,
+        'related_id' => $lockedReport->id,
+        'is_read' => false,
+        'read_at' => null,
+    ]);
+}
 
             ActivityLog::create([
                 'user_id' =>

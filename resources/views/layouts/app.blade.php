@@ -40,6 +40,46 @@
             id="mainNavigation"
         >
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                {{-- ======================================================
+     MENU NOTIFIKASI UNTUK SEMUA PENGGUNA
+====================================================== --}}
+@if (auth()->check())
+    @php
+        /*
+         * Menghitung notifikasi yang belum dibaca
+         * milik pengguna yang sedang login.
+         */
+        $navbarUnreadNotificationCount = auth()
+            ->user()
+            ->appNotifications()
+            ->unread()
+            ->count();
+    @endphp
+
+    <li class="nav-item">
+        <a
+            href="{{ route('notifications.index') }}"
+            class="nav-link
+                {{
+                    request()->routeIs('notifications.*')
+                        ? 'active'
+                        : ''
+                }}"
+        >
+            Notifikasi
+
+            @if ($navbarUnreadNotificationCount > 0)
+                <span class="badge text-bg-danger ms-1">
+                    {{
+                        $navbarUnreadNotificationCount > 99
+                            ? '99+'
+                            : $navbarUnreadNotificationCount
+                    }}
+                </span>
+            @endif
+        </a>
+    </li>
+@endif
                 <li class="nav-item">
                     <a
                         class="nav-link

@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\NotificationController;
+
 use App\Http\Controllers\MonitoringController;
 
 use App\Http\Controllers\Leader\LeaderTaskController;
@@ -612,3 +614,50 @@ Route::middleware([
         ]
     )
     ->name('leader.monitoring.index');
+
+/*
+|--------------------------------------------------------------------------
+| PUSAT NOTIFIKASI
+|--------------------------------------------------------------------------
+|
+| Route ini dapat digunakan oleh seluruh pengguna yang login.
+|
+*/
+Route::middleware('auth')
+    ->prefix('notifikasi')
+    ->name('notifications.')
+    ->group(function () {
+        /*
+         * Menampilkan daftar notifikasi.
+         */
+        Route::get(
+            '/',
+            [
+                NotificationController::class,
+                'index',
+            ]
+        )->name('index');
+
+        /*
+         * Membuka dan menandai satu notifikasi
+         * sebagai sudah dibaca.
+         */
+        Route::get(
+            '/{notification}/buka',
+            [
+                NotificationController::class,
+                'open',
+            ]
+        )->name('open');
+
+        /*
+         * Menandai semua notifikasi sebagai dibaca.
+         */
+        Route::patch(
+            '/baca-semua',
+            [
+                NotificationController::class,
+                'markAllAsRead',
+            ]
+        )->name('read-all');
+    });
