@@ -100,26 +100,54 @@
 @if (auth()->check())
 
     {{-- Menu khusus Admin --}}
-    @if (auth()->user()->role?->name === 'Admin')
-        <li class="nav-item">
-            <a
-                href="{{ route('admin.reports.index') }}"
-                class="nav-link
-                    {{ request()->routeIs('admin.reports.*')
-                        ? 'active'
-                        : '' }}"
-            >
-                Verifikasi Laporan
-            </a>
-        </li>
-    @endif
+    {{-- ======================================================
+     MENU KHUSUS ADMIN
+====================================================== --}}
+@if (
+    auth()->check()
+    && auth()->user()->role?->name === 'Admin'
+)
+
+    {{-- Menu untuk melihat rekap presensi dan laporan. --}}
+    <li class="nav-item">
+        <a
+            href="{{ route('admin.monitoring.index') }}"
+            class="nav-link
+                {{ request()->routeIs('admin.monitoring.*')
+                    ? 'active'
+                    : '' }}"
+        >
+            Monitoring & Rekap
+        </a>
+    </li>
+
+    {{-- Menu untuk memeriksa laporan Personel. --}}
+    <li class="nav-item">
+        <a
+            href="{{ route('admin.reports.index') }}"
+            class="nav-link
+                {{ request()->routeIs('admin.reports.*')
+                    ? 'active'
+                    : '' }}"
+        >
+            Verifikasi Laporan
+        </a>
+    </li>
+
+@endif
 
    {{-- ======================================================
      MENU KHUSUS PIMPINAN
 ====================================================== --}}
-@if (auth()->user()->role?->name === 'Pimpinan')
+{{-- ======================================================
+     MENU KHUSUS PIMPINAN
+====================================================== --}}
+@if (
+    auth()->check()
+    && auth()->user()->role?->name === 'Pimpinan'
+)
 
-    {{-- Menu untuk memberikan dan memantau tugas Personel. --}}
+    {{-- Menu untuk memberikan tugas kepada Personel. --}}
     <li class="nav-item">
         <a
             href="{{ route('leader.tasks.index') }}"
@@ -132,7 +160,20 @@
         </a>
     </li>
 
-    {{-- Menu untuk memeriksa laporan WFH Personel. --}}
+    {{-- Menu untuk melihat rekap presensi dan laporan. --}}
+    <li class="nav-item">
+        <a
+            href="{{ route('leader.monitoring.index') }}"
+            class="nav-link
+                {{ request()->routeIs('leader.monitoring.*')
+                    ? 'active'
+                    : '' }}"
+        >
+            Monitoring & Rekap
+        </a>
+    </li>
+
+    {{-- Menu untuk memeriksa laporan Personel. --}}
     <li class="nav-item">
         <a
             href="{{ route('leader.reports.index') }}"

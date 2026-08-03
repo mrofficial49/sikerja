@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\MonitoringController;
+
 use App\Http\Controllers\Leader\LeaderTaskController;
 
 use App\Http\Controllers\Review\WorkReportReviewController;
@@ -572,3 +574,41 @@ Route::middleware([
             ]
         )->name('cancel');
     });
+
+/*
+|--------------------------------------------------------------------------
+| MONITORING DAN REKAPITULASI WFH
+|--------------------------------------------------------------------------
+*/
+
+/*
+ * Monitoring untuk Admin.
+ */
+Route::middleware([
+    'auth',
+    'role:Admin',
+])
+    ->get(
+        '/admin/monitoring',
+        [
+            MonitoringController::class,
+            'index',
+        ]
+    )
+    ->name('admin.monitoring.index');
+
+/*
+ * Monitoring untuk Pimpinan.
+ */
+Route::middleware([
+    'auth',
+    'role:Pimpinan',
+])
+    ->get(
+        '/pimpinan/monitoring',
+        [
+            MonitoringController::class,
+            'index',
+        ]
+    )
+    ->name('leader.monitoring.index');
