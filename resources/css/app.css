@@ -1,0 +1,91 @@
+/* Memuat seluruh CSS Bootstrap. */
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
+/* Warna utama aplikasi SIKERJA. */
+:root {
+    --sikerja-green-dark: #183c2c;
+    --sikerja-green: #285943;
+    --sikerja-green-light: #eaf3ee;
+    --sikerja-gold: #c7a44a;
+    --sikerja-bg: #f4f7f5;
+}
+
+/* Pengaturan dasar halaman. */
+body {
+    min-height: 100vh;
+    background-color: var(--sikerja-bg);
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Latar belakang halaman login. */
+.login-page {
+    min-height: 100vh;
+    background:
+        linear-gradient(
+            135deg,
+            rgba(24, 60, 44, 0.97),
+            rgba(40, 89, 67, 0.92)
+        );
+}
+
+/* Kotak login. */
+.login-card {
+    border: 0;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+}
+
+/* Bagian informasi aplikasi. */
+.login-brand-panel {
+    min-height: 560px;
+    background:
+        linear-gradient(
+            160deg,
+            rgba(18, 52, 37, 0.97),
+            rgba(44, 92, 69, 0.94)
+        );
+    color: white;
+}
+
+/* Logo sementara berbentuk lingkaran. */
+.brand-logo {
+    width: 86px;
+    height: 86px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--sikerja-gold);
+    border-radius: 50%;
+    color: var(--sikerja-gold);
+    font-size: 28px;
+    font-weight: bold;
+}
+
+/* Tombol utama aplikasi. */
+.btn-sikerja {
+    background-color: var(--sikerja-green);
+    border-color: var(--sikerja-green);
+    color: white;
+}
+
+.btn-sikerja:hover,
+.btn-sikerja:focus {
+    background-color: var(--sikerja-green-dark);
+    border-color: var(--sikerja-green-dark);
+    color: white;
+}
+
+/* Navbar dashboard. */
+.navbar-sikerja {
+    background-color: var(--sikerja-green-dark);
+}
+
+/* Tampilan pada layar HP. */
+@media (max-width: 991.98px) {
+    .login-brand-panel {
+        min-height: auto;
+        padding-top: 40px !important;
+        padding-bottom: 40px !important;
+    }
+}
