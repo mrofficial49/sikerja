@@ -114,20 +114,38 @@
         </li>
     @endif
 
-    {{-- Menu khusus Pimpinan --}}
-    @if (auth()->user()->role?->name === 'Pimpinan')
-        <li class="nav-item">
-            <a
-                href="{{ route('leader.reports.index') }}"
-                class="nav-link
-                    {{ request()->routeIs('leader.reports.*')
-                        ? 'active'
-                        : '' }}"
-            >
-                Verifikasi Laporan
-            </a>
-        </li>
-    @endif
+   {{-- ======================================================
+     MENU KHUSUS PIMPINAN
+====================================================== --}}
+@if (auth()->user()->role?->name === 'Pimpinan')
+
+    {{-- Menu untuk memberikan dan memantau tugas Personel. --}}
+    <li class="nav-item">
+        <a
+            href="{{ route('leader.tasks.index') }}"
+            class="nav-link
+                {{ request()->routeIs('leader.tasks.*')
+                    ? 'active'
+                    : '' }}"
+        >
+            Tugas Personel
+        </a>
+    </li>
+
+    {{-- Menu untuk memeriksa laporan WFH Personel. --}}
+    <li class="nav-item">
+        <a
+            href="{{ route('leader.reports.index') }}"
+            class="nav-link
+                {{ request()->routeIs('leader.reports.*')
+                    ? 'active'
+                    : '' }}"
+        >
+            Verifikasi Laporan
+        </a>
+    </li>
+
+@endif
 
 @endif
             </ul>

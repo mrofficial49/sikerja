@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Leader\LeaderTaskController;
+
 use App\Http\Controllers\Review\WorkReportReviewController;
 
 use App\Http\Controllers\Admin\UnitController;
@@ -508,4 +510,65 @@ Route::middleware([
                 'downloadFile',
             ]
         )->name('files.download');
+    });
+
+/*
+|--------------------------------------------------------------------------
+| TUGAS PIMPINAN KEPADA PERSONEL
+|--------------------------------------------------------------------------
+|
+| Pimpinan dapat membuat, melihat, dan membatalkan tugas
+| yang diberikan kepada Personel pada jadwal WFH aktif.
+|
+*/
+Route::middleware([
+    'auth',
+    'role:Pimpinan',
+])
+    ->prefix('pimpinan/tugas')
+    ->name('leader.tasks.')
+    ->group(function () {
+        /*
+         * Daftar tugas Pimpinan.
+         */
+        Route::get(
+            '/',
+            [
+                LeaderTaskController::class,
+                'index',
+            ]
+        )->name('index');
+
+        /*
+         * Form pemberian tugas.
+         */
+        Route::get(
+            '/buat',
+            [
+                LeaderTaskController::class,
+                'create',
+            ]
+        )->name('create');
+
+        /*
+         * Menyimpan tugas baru.
+         */
+        Route::post(
+            '/',
+            [
+                LeaderTaskController::class,
+                'store',
+            ]
+        )->name('store');
+
+        /*
+         * Membatalkan tugas.
+         */
+        Route::patch(
+            '/{workItem}/cancel',
+            [
+                LeaderTaskController::class,
+                'cancel',
+            ]
+        )->name('cancel');
     });

@@ -209,17 +209,32 @@ class WorkReportController extends Controller
             ->get();
 
         /*
-         * Personel wajib mempunyai minimal
-         * satu rencana kerja pribadi.
+         * Personel wajib memiliki minimal satu pekerjaan aktif.
+         *
+         * Pekerjaan dapat berasal dari:
+         * 1. Rencana kerja pribadi.
+         * 2. Tugas langsung dari Pimpinan.
+         *
+         * Pekerjaan yang sudah dibatalkan tidak dihitung.
          */
-        if (
-            $items
-                ->where('source_type', 'personal_plan')
-                ->isEmpty()
-        ) {
+        $activeItems = $items->filter(
+            function ($item) {
+                return in_array(
+                    $item->source_type,
+                    [
+                        'personal_plan',
+                        'leader_task',
+                    ],
+                    true
+                )
+                && $item->status !== 'cancelled';
+            }
+        );
+
+        if ($activeItems->isEmpty()) {
             throw ValidationException::withMessages([
                 'report' =>
-                    'Minimal satu rencana kerja pribadi wajib dibuat.',
+                    'Belum ada pekerjaan aktif. Buat rencana kerja pribadi atau tunggu tugas dari Pimpinan.',
             ]);
         }
 
