@@ -19,51 +19,38 @@
     </div>
 @endif
 
-<div class="row g-4 mb-4">
-    <div class="col-md-6 col-xl-4">
+{{-- Ringkasan utama --}}
+<div class="row g-3 mb-4">
+    <div class="col-6 col-xl-3">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-body">
                 <small class="text-secondary">
-                    Notifikasi Belum Dibaca
-                </small>
-
-                <div class="display-6 fw-bold mt-2">
-                    {{ $unreadNotifications }}
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-6 col-xl-4">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-body">
-                <small class="text-secondary">
-                    Status Jadwal WFH
+                    Status Jadwal
                 </small>
 
                 <div class="h4 fw-bold mt-2 mb-0">
-                    {{
-                        $membership
-                            ? 'Terjadwal'
-                            : 'Tidak Ada Jadwal'
-                    }}
+                    {{ $membership ? 'Terjadwal' : 'Tidak Ada' }}
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="col-md-6 col-xl-4">
+    <div class="col-6 col-xl-3">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-body">
                 <small class="text-secondary">
-                    Status Check-in
+                    Check-in
                 </small>
 
                 <div class="h4 fw-bold mt-2 mb-0">
                     @if ($membership?->attendance?->checkin_at)
-                        Sudah Check-in
+                        <span class="text-success">
+                            Selesai
+                        </span>
                     @elseif ($membership)
-                        Belum Check-in
+                        <span class="text-warning">
+                            Belum
+                        </span>
                     @else
                         -
                     @endif
@@ -71,14 +58,76 @@
             </div>
         </div>
     </div>
+
+    <div class="col-6 col-xl-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <small class="text-secondary">
+                    Check-out
+                </small>
+
+                <div class="h4 fw-bold mt-2 mb-0">
+                    @if ($membership?->attendance?->checkout_at)
+                        <span class="text-success">
+                            Selesai
+                        </span>
+                    @elseif ($membership?->attendance?->checkin_at)
+                        <span class="text-warning">
+                            Belum
+                        </span>
+                    @else
+                        -
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-6 col-xl-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <small class="text-secondary">
+                    Notifikasi Baru
+                </small>
+
+                <div class="display-6 fw-bold text-danger">
+                    {{ $unreadNotifications }}
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @if ($membership)
+    @php
+        $report = $membership->workReport;
+
+        $reportStatusLabel = match ($report?->status) {
+            'draft' => 'Draft',
+            'waiting_verification' =>
+                'Menunggu Verifikasi',
+            'needs_revision' => 'Perlu Revisi',
+            'approved' => 'Disetujui',
+            'incomplete' => 'Belum Lengkap',
+            'completed_offline' =>
+                'Diselesaikan Offline',
+            default => 'Belum Dibuat',
+        };
+
+        $reportStatusClass = match ($report?->status) {
+            'waiting_verification' => 'warning',
+            'needs_revision' => 'danger',
+            'approved' => 'success',
+            default => 'secondary',
+        };
+    @endphp
+
+    {{-- Informasi jadwal --}}
     <div class="card border-0 shadow-sm mb-4">
         <div
             class="card-header bg-white py-3
                    d-flex justify-content-between
-                   align-items-center flex-wrap gap-2"
+                   align-items-center flex-wrap gap-3"
         >
             <div>
                 <h2 class="h5 fw-bold mb-1">
@@ -87,50 +136,25 @@
 
                 <small class="text-secondary">
                     {{
-                        $membership->schedule->wfh_date
-                            ->translatedFormat('l, d F Y')
+                        $membership
+                            ->schedule
+                            ->wfh_date
+                            ->translatedFormat(
+                                'l, d F Y'
+                            )
                     }}
                 </small>
             </div>
 
-            <div class="d-flex flex-wrap gap-2">
-                <a
-                    href="{{ route('personnel.attendance.show') }}"
-                    class="btn btn-outline-success"
-                >
-                    {{
-                        $membership->attendance?->checkin_at
-                            ? 'Lihat Presensi'
-                            : 'Lakukan Check-in'
-                    }}
-                </a>
-
-                @if ($membership->attendance?->checkin_at)
-                    <a
-                        href="{{
-                            route(
-                                'personnel.work-items.index'
-                            )
-                        }}"
-                        class="btn btn-sikerja"
-                    >
-                        Rencana Kerja
-                        ({{ $personalPlanCount }})
-                    </a>
-
-
-                    <a
-                        href="{{ route('personnel.report.show') }}"
-                        class="btn btn-outline-primary"
-                    >
-                        Laporan & Check-out
-                    </a>
-                @endif
-            </div>
+            <span
+                class="badge text-bg-{{ $reportStatusClass }}"
+            >
+                {{ $reportStatusLabel }}
+            </span>
         </div>
 
         <div class="card-body">
-            <div class="row g-3">
+            <div class="row g-3 mb-4">
                 <div class="col-md-4">
                     <small class="text-secondary">
                         Jenis Jadwal
@@ -153,7 +177,8 @@
                     <div class="fw-semibold">
                         {{
                             $membership->checkin_deadline
-                                ? $membership->checkin_deadline
+                                ? $membership
+                                    ->checkin_deadline
                                     ->format('H:i')
                                     . ' WIB'
                                 : '-'
@@ -167,10 +192,127 @@
                     </small>
 
                     <div class="fw-semibold">
-                        {{
-                            $membership->workReport?->status
-                                ?? 'Belum Dibuat'
-                        }}
+                        {{ $reportStatusLabel }}
+                    </div>
+                </div>
+            </div>
+
+            {{-- Tombol sesuai tahapan Personel --}}
+            <div class="d-flex flex-wrap gap-2">
+                <a
+                    href="{{ route('personnel.attendance.show') }}"
+                    class="btn btn-outline-success"
+                >
+                    {{
+                        $membership
+                            ->attendance
+                            ?->checkin_at
+                                ? 'Lihat Presensi'
+                                : 'Lakukan Check-in'
+                    }}
+                </a>
+
+                @if ($membership->attendance?->checkin_at)
+                    <a
+                        href="{{
+                            route(
+                                'personnel.work-items.index'
+                            )
+                        }}"
+                        class="btn btn-sikerja"
+                    >
+                        Pekerjaan
+                    </a>
+
+                    <a
+                        href="{{
+                            route(
+                                'personnel.report.show'
+                            )
+                        }}"
+                        class="btn btn-outline-primary"
+                    >
+                        Laporan & Check-out
+                    </a>
+                @endif
+
+                <a
+                    href="{{ route('notifications.index') }}"
+                    class="btn btn-outline-secondary"
+                >
+                    Notifikasi
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {{-- Statistik pekerjaan --}}
+    <div class="row g-3">
+        <div class="col-6 col-lg">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <small class="text-secondary">
+                        Total Pekerjaan
+                    </small>
+
+                    <div class="h2 fw-bold mb-0">
+                        {{ $workStatistics['total'] }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-lg">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <small class="text-secondary">
+                        Tugas Pimpinan
+                    </small>
+
+                    <div class="h2 fw-bold mb-0">
+                        {{ $workStatistics['leader_tasks'] }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-lg">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <small class="text-secondary">
+                        Rencana Pribadi
+                    </small>
+
+                    <div class="h2 fw-bold mb-0">
+                        {{ $workStatistics['personal_plans'] }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-lg">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <small class="text-secondary">
+                        Belum Selesai
+                    </small>
+
+                    <div class="h2 fw-bold text-warning mb-0">
+                        {{ $workStatistics['in_progress'] }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-lg">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <small class="text-secondary">
+                        Selesai
+                    </small>
+
+                    <div class="h2 fw-bold text-success mb-0">
+                        {{ $workStatistics['completed'] }}
                     </div>
                 </div>
             </div>
@@ -183,9 +325,17 @@
                 Tidak Ada Jadwal WFH Aktif
             </h2>
 
-            <p class="text-secondary mb-0">
-                Jadwal aktif akan ditampilkan pada halaman ini.
+            <p class="text-secondary mb-3">
+                Jadwal WFH aktif akan ditampilkan
+                pada halaman ini.
             </p>
+
+            <a
+                href="{{ route('notifications.index') }}"
+                class="btn btn-outline-primary"
+            >
+                Lihat Notifikasi
+            </a>
         </div>
     </div>
 @endif
