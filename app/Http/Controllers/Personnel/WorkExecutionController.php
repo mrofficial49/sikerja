@@ -52,8 +52,10 @@ class WorkExecutionController extends Controller
          * Data tidak dapat diubah setelah check-out
          * atau ketika laporan telah dikunci.
          */
-        $canModify = ! $report->is_locked
-            && ! $membership->attendance?->checkout_at;
+        $canModify = $this->reportCanBeModified(
+            $membership,
+            $report
+        );
 
         $requiresChangeReason = $report->status !== 'draft';
 
@@ -89,8 +91,10 @@ class WorkExecutionController extends Controller
         [$membership, $report] = $context;
 
         if (
-            $report->is_locked
-            || $membership->attendance?->checkout_at
+            ! $this->reportCanBeModified(
+                $membership,
+                $report
+            )
         ) {
             return back()->with(
                 'error',
@@ -307,8 +311,10 @@ class WorkExecutionController extends Controller
         [$membership, $report] = $context;
 
         if (
-            $report->is_locked
-            || $membership->attendance?->checkout_at
+            ! $this->reportCanBeModified(
+                $membership,
+                $report
+            )
         ) {
             return back()->with(
                 'error',
@@ -621,8 +627,10 @@ class WorkExecutionController extends Controller
         );
 
         if (
-            $report->is_locked
-            || $membership->attendance?->checkout_at
+            ! $this->reportCanBeModified(
+                $membership,
+                $report
+            )
         ) {
             return back()->with(
                 'error',
@@ -876,4 +884,51 @@ private function ensureFileBelongsToItem(
             'user_agent' => $request->userAgent(),
         ]);
     }
+
+    /**
+     * Menentukan apakah laporan masih boleh diperbaiki.
+     *
+     * Laporan yang sudah check-out hanya boleh diubah
+     * ketika reviewer meminta revisi.
+     */
+    private function reportCanBeModified(
+        WfhScheduleMember $membership,
+        WorkReport $report
+    ): bool {
+        /*
+         * Laporan yang benar-benar terkunci
+         * tidak boleh diubah.
+         */
+        if ($report->is_locked) {
+            return false;
+        }
+
+        /*
+         * Sebelum check-out, laporan masih boleh diubah.
+         */
+        if (! $membership->attendance?->checkout_at) {
+            return true;
+        }
+
+        /*
+         * Setelah check-out, perubahan hanya diizinkan
+         * apabila status laporan adalah needs_revision.
+         */
+        /*
+         * needs_revision adalah status awal saat laporan
+         * dikembalikan oleh reviewer.
+         *
+         * draft adalah status setelah Personel mulai
+         * melakukan perbaikan.
+         */
+        return in_array(
+            $report->status,
+            [
+                'needs_revision',
+                'draft',
+            ],
+            true
+        );
+    }
+
 }

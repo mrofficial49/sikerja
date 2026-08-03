@@ -608,7 +608,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     'success'
                 );
 
-                window.location.href = result.redirect;
+                
             } catch (error) {
                 showMessage(error.message);
 

@@ -313,19 +313,11 @@ class WorkReportController extends Controller
             ]);
         });
 
-        /*
-         * Pesan dibedakan antara pengiriman awal
-         * dan pengiriman ulang setelah revisi.
-         */
-        $successMessage = $checkoutCompleted
-            ? 'Laporan berhasil dikirim ulang dan menunggu verifikasi.'
-            : 'Laporan berhasil dikirim. Silakan melakukan check-out.';
-
         return redirect()
             ->route('personnel.report.show')
             ->with(
                 'success',
-                $successMessage
+                'Laporan berhasil dikirim. Silakan melakukan check-out.'
             );
     }
 

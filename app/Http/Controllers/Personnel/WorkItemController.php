@@ -71,8 +71,10 @@ class WorkItemController extends Controller
 
         $requiresChangeReason = $report->status !== 'draft';
 
-        $canModify = ! $report->is_locked
-            && ! $membership->attendance?->checkout_at;
+        $canModify = $this->reportCanBeModified(
+            $membership,
+            $report
+        );
 
         return view('personnel.work-items.index', compact(
             'membership',
@@ -460,14 +462,16 @@ class WorkItemController extends Controller
         );
 
         if (
-            $report->is_locked
-            || $membership->attendance?->checkout_at
+            ! $this->reportCanBeModified(
+                $membership,
+                $report
+            )
         ) {
             return redirect()
                 ->route('personnel.work-items.index')
                 ->with(
                     'error',
-                    'Rencana kerja tidak dapat diubah setelah check-out.'
+                    'Rencana kerja tidak dapat diubah setelah check-out, kecuali laporan sedang direvisi.'
                 );
         }
 
@@ -592,4 +596,51 @@ class WorkItemController extends Controller
             'user_agent' => $request->userAgent(),
         ]);
     }
+
+    /**
+     * Menentukan apakah laporan masih boleh diperbaiki.
+     *
+     * Laporan yang sudah check-out hanya boleh diubah
+     * ketika reviewer meminta revisi.
+     */
+    private function reportCanBeModified(
+        WfhScheduleMember $membership,
+        WorkReport $report
+    ): bool {
+        /*
+         * Laporan yang benar-benar terkunci
+         * tidak boleh diubah.
+         */
+        if ($report->is_locked) {
+            return false;
+        }
+
+        /*
+         * Sebelum check-out, laporan masih boleh diubah.
+         */
+        if (! $membership->attendance?->checkout_at) {
+            return true;
+        }
+
+        /*
+         * Setelah check-out, perubahan hanya diizinkan
+         * apabila status laporan adalah needs_revision.
+         */
+        /*
+         * needs_revision adalah status awal saat laporan
+         * dikembalikan oleh reviewer.
+         *
+         * draft adalah status setelah Personel mulai
+         * melakukan perbaikan.
+         */
+        return in_array(
+            $report->status,
+            [
+                'needs_revision',
+                'draft',
+            ],
+            true
+        );
+    }
+
 }

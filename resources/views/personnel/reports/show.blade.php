@@ -200,41 +200,68 @@
 
 <div class="card border-0 shadow-sm mt-4">
     <div class="card-body">
-        @if ($checkoutCompleted)
-            <div class="alert alert-success mb-0">
-                Check-out telah selesai dan laporan sudah dikunci.
-            </div>
-        @elseif ($report->status === 'waiting_verification')
-            <div
-                class="d-flex flex-column flex-md-row
-                       justify-content-between
-                       align-items-md-center gap-3"
-            >
-                <div>
-                    <h2 class="h5 fw-bold mb-1">
-                        Laporan Sudah Dikirim
-                    </h2>
 
-                    <p class="text-secondary mb-0">
-                        Lanjutkan dengan foto dan lokasi check-out.
-                    </p>
-                </div>
+        {{--
+            KONDISI 1: LAPORAN SEDANG DIREVISI
+
+            Status dapat berupa:
+            - needs_revision: baru dikembalikan reviewer.
+            - draft: Personel sudah mulai memperbaiki laporan.
+
+            Walaupun sudah check-out, laporan revisi tetap
+            boleh diperbaiki dan dikirim ulang.
+        --}}
+        @if (
+            $checkoutCompleted
+            && in_array(
+                $report->status,
+                [
+                    'needs_revision',
+                    'draft',
+                ],
+                true
+            )
+            && ! $report->is_locked
+        )
+            <div class="alert alert-warning">
+                <h2 class="h5 fw-bold mb-2">
+                    Laporan Perlu Diperbaiki
+                </h2>
+
+                @if ($report->verification_note)
+                    <div class="mb-3">
+                        <strong>Catatan reviewer:</strong>
+
+                        <div class="mt-1">
+                            {{ $report->verification_note }}
+                        </div>
+                    </div>
+                @endif
+
+                <p class="mb-3">
+                    Perbaiki progres, kendala, tindak lanjut,
+                    atau bukti PDF sebelum mengirim ulang laporan.
+                </p>
 
                 <a
-                    href="{{ route('personnel.checkout.show') }}"
-                    class="btn btn-success"
+                    href="{{ route('personnel.work-items.index') }}"
+                    class="btn btn-warning"
                 >
-                    Lakukan Check-out
+                    Perbaiki Pekerjaan
                 </a>
             </div>
-        @elseif (! $report->is_locked)
+
+            {{--
+                Tombol ini digunakan setelah Personel selesai
+                melakukan semua perbaikan.
+            --}}
             <form
                 method="POST"
                 action="{{ route('personnel.report.submit') }}"
                 onsubmit="
                     return confirm(
-                        'Kirim laporan kerja ini? Pastikan seluruh pekerjaan sudah lengkap.'
-                    )
+                        'Kirim ulang laporan yang sudah diperbaiki?'
+                    );
                 "
             >
                 @csrf
@@ -243,9 +270,117 @@
                     type="submit"
                     class="btn btn-sikerja btn-lg"
                 >
-                    Kirim Laporan Kerja
+                    Kirim Ulang Laporan
                 </button>
             </form>
+
+        {{--
+            KONDISI 2: LAPORAN SUDAH DISETUJUI
+        --}}
+        @elseif ($report->status === 'approved')
+            <div class="alert alert-success mb-0">
+                <h2 class="h5 fw-bold mb-1">
+                    Laporan Sudah Disetujui
+                </h2>
+
+                <p class="mb-0">
+                    Laporan kerja telah diperiksa dan disetujui.
+                </p>
+
+                @if ($report->verification_note)
+                    <hr>
+
+                    <strong>Catatan reviewer:</strong>
+
+                    <div class="mt-1">
+                        {{ $report->verification_note }}
+                    </div>
+                @endif
+            </div>
+
+        {{--
+            KONDISI 3: LAPORAN MENUNGGU VERIFIKASI
+        --}}
+        @elseif ($report->status === 'waiting_verification')
+
+            @if ($checkoutCompleted)
+                <div class="alert alert-info mb-0">
+                    <h2 class="h5 fw-bold mb-1">
+                        Menunggu Verifikasi
+                    </h2>
+
+                    <p class="mb-0">
+                        Check-out telah selesai dan laporan sedang
+                        menunggu pemeriksaan Admin atau Pimpinan.
+                    </p>
+                </div>
+            @else
+                <div
+                    class="d-flex flex-column flex-md-row
+                           justify-content-between
+                           align-items-md-center gap-3"
+                >
+                    <div>
+                        <h2 class="h5 fw-bold mb-1">
+                            Laporan Sudah Dikirim
+                        </h2>
+
+                        <p class="text-secondary mb-0">
+                            Lanjutkan dengan foto dan lokasi check-out.
+                        </p>
+                    </div>
+
+                    <a
+                        href="{{ route('personnel.checkout.show') }}"
+                        class="btn btn-success"
+                    >
+                        Lakukan Check-out
+                    </a>
+                </div>
+            @endif
+
+        {{--
+            KONDISI 4: LAPORAN AWAL BELUM DIKIRIM
+
+            Kondisi ini digunakan sebelum Personel pertama kali
+            mengirim laporan dan sebelum melakukan check-out.
+        --}}
+        @elseif (! $report->is_locked)
+           <form
+    method="POST"
+    action="{{ route('personnel.report.submit') }}"
+    onsubmit="
+        return confirm(
+            'Kirim ulang laporan yang sudah diperbaiki?'
+        );
+    "
+>
+    {{-- Token keamanan Laravel. --}}
+    @csrf
+
+    <button
+        type="submit"
+        class="btn btn-sikerja btn-lg"
+    >
+        {{
+            $checkoutCompleted
+            && in_array(
+                $report->status,
+                ['needs_revision', 'draft'],
+                true
+            )
+                ? 'Kirim Ulang Laporan'
+                : 'Kirim Laporan Kerja'
+        }}
+    </button>
+</form>
+        {{--
+            KONDISI CADANGAN: LAPORAN TERKUNCI
+        --}}
+        @else
+            <div class="alert alert-secondary mb-0">
+                Laporan sedang dikunci dan tidak dapat diubah.
+            </div>
         @endif
     </div>
 </div>
