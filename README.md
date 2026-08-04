@@ -1,59 +1,257 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# SIKERJA
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+**Sistem Informasi Kinerja dan Aktivitas Personel**
 
-## About Laravel
+SIKERJA adalah aplikasi berbasis web untuk mengelola pelaksanaan Work From Home atau WFH, mulai dari penyusunan jadwal, penentuan Personel, presensi berbasis foto dan GPS, pemberian tugas, pelaporan pekerjaan, sampai verifikasi oleh Pimpinan atau Admin.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Fitur Utama
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- Autentikasi menggunakan ID Login dan password.
+- Pembagian hak akses Admin, Pimpinan, dan Personel.
+- Pengelolaan unit dan pengguna.
+- Pembuatan serta aktivasi jadwal WFH.
+- Penentuan Personel yang melaksanakan WFH.
+- Check-in dan check-out menggunakan kamera serta GPS.
+- Penyimpanan foto presensi pada storage privat.
+- Rencana kerja pribadi Personel.
+- Penugasan dari Pimpinan.
+- Upload bukti pekerjaan PDF.
+- Pengiriman dan verifikasi laporan.
+- Permintaan revisi laporan.
+- Monitoring dan rekapitulasi pelaksanaan WFH.
+- Pusat notifikasi.
+- Bukti foto dan lokasi presensi.
+- Pengujian otomatis hak akses.
+- Halaman error khusus SIKERJA.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Teknologi
 
-## Learning Laravel
+- Laravel 12
+- PHP 8.2 atau lebih baru
+- MariaDB atau MySQL
+- Bootstrap
+- JavaScript
+- Vite
+- PHPUnit
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## Role Pengguna
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Admin
 
-## Laravel Sponsors
+Admin bertugas mengelola:
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+- Data pengguna.
+- Unit kerja.
+- Jadwal WFH.
+- Anggota jadwal.
+- Monitoring presensi.
+- Verifikasi laporan.
+- Rekapitulasi pelaksanaan WFH.
 
-### Premium Partners
+### Pimpinan
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Pimpinan dapat:
 
-## Contributing
+- Memberikan tugas kepada Personel.
+- Memantau check-in dan check-out.
+- Melihat foto serta GPS presensi.
+- Memeriksa laporan Personel.
+- Menyetujui atau meminta revisi laporan.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Personel
 
-## Code of Conduct
+Personel dapat:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+- Melihat jadwal WFH.
+- Melakukan check-in.
+- Membuat rencana kerja pribadi.
+- Menerima tugas Pimpinan.
+- Memperbarui pelaksanaan pekerjaan.
+- Mengunggah bukti pekerjaan.
+- Mengirim laporan.
+- Melakukan check-out.
+- Melihat status verifikasi laporan.
 
-## Security Vulnerabilities
+## Instalasi Lokal
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 1. Unduh source code
 
-## License
+```bash
+git clone ALAMAT_REPOSITORY
+cd sikerja
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### 2. Instal dependency PHP
+
+```bash
+composer install
+```
+
+### 3. Instal dependency frontend
+
+```bash
+npm install
+```
+
+### 4. Buat file konfigurasi
+
+```bash
+cp .env.example .env
+php artisan key:generate
+```
+
+### 5. Atur database pada `.env`
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=sikerja
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+### 6. Buat tabel dan data awal
+
+```bash
+php artisan migrate
+php artisan db:seed
+```
+
+### 7. Jalankan frontend
+
+```bash
+npm run dev
+```
+
+### 8. Jalankan Laravel
+
+Buka Terminal kedua:
+
+```bash
+php artisan serve
+```
+
+Aplikasi dapat dibuka melalui:
+
+```text
+http://127.0.0.1:8000
+```
+
+## Data Demo Presentasi
+
+Data demo dibuat secara manual menggunakan:
+
+```bash
+php artisan db:seed --class=DemoSeeder
+```
+
+Akun demo:
+
+| Role | ID Login | Password |
+|---|---|---|
+| Admin | `DEMOADMIN` | `DemoSikerja#2026` |
+| Pimpinan | `DEMOPIMPINAN` | `DemoSikerja#2026` |
+| Personel 1 | `DEMOPER001` | `DemoSikerja#2026` |
+| Personel 2 | `DEMOPER002` | `DemoSikerja#2026` |
+| Personel 3 | `DEMOPER003` | `DemoSikerja#2026` |
+| Personel 4 | `DEMOPER004` | `DemoSikerja#2026` |
+| Personel 5 | `DEMOPER005` | `DemoSikerja#2026` |
+
+Skenario Personel demo:
+
+| Akun | Skenario |
+|---|---|
+| `DEMOPER001` | Laporan menunggu verifikasi |
+| `DEMOPER002` | Laporan perlu revisi |
+| `DEMOPER003` | Laporan sudah disetujui |
+| `DEMOPER004` | Pekerjaan sedang berlangsung |
+| `DEMOPER005` | Terjadwal tetapi belum check-in |
+
+> Akun demo hanya untuk pengembangan dan presentasi. Hapus atau nonaktifkan akun demo sebelum aplikasi digunakan pada lingkungan production.
+
+## Menjalankan Pengujian
+
+```bash
+php artisan optimize:clear
+php artisan test
+```
+
+Pengujian mencakup:
+
+- Hak akses setiap role.
+- Akun nonaktif.
+- Password sementara.
+- Akses bukti foto presensi.
+- Perlindungan data Personel.
+- Halaman error aplikasi.
+
+## Keamanan File
+
+Foto presensi dan bukti pekerjaan disimpan pada:
+
+```text
+storage/app/private
+```
+
+File tidak boleh diakses langsung melalui URL publik. File hanya dikirim melalui controller yang telah memeriksa autentikasi dan hak akses pengguna.
+
+Konfigurasi local storage:
+
+```php
+'serve' => false,
+```
+
+## Dokumentasi
+
+- [Panduan Pengguna](docs/PANDUAN_PENGGUNA.md)
+- [Backup dan Restore Database](docs/BACKUP_RESTORE.md)
+- [Panduan Presentasi](docs/PANDUAN_PRESENTASI.md)
+- [Panduan Deployment](docs/DEPLOYMENT.md)
+
+## Struktur Penting
+
+```text
+app/Http/Controllers     Controller aplikasi
+app/Models               Model database
+app/Http/Middleware      Middleware keamanan
+database/migrations      Struktur database
+database/seeders         Data awal dan data demo
+resources/views          Tampilan Blade
+routes/web.php           Route aplikasi
+storage/app/private      File privat
+tests/Feature            Pengujian fitur
+```
+
+## Perintah Pemeliharaan
+
+Membersihkan cache:
+
+```bash
+php artisan optimize:clear
+```
+
+Membuat ulang cache production:
+
+```bash
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+```
+
+Melihat daftar route:
+
+```bash
+php artisan route:list
+```
+
+## Catatan Production
+
+Konfigurasi wajib:
+
+```env
+APP_ENV=production
+APP_DEBUG=false
+```
+
+Jangan menggunakan akun demo atau password bawaan pada aplikasi production.
