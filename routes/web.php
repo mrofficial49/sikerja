@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\AttendanceEvidenceController;
+
 use App\Http\Controllers\NotificationController;
 
 use App\Http\Controllers\MonitoringController;
@@ -674,4 +676,50 @@ Route::middleware([
                 'markAllAsRead',
             ]
         )->name('read-all');
+    });
+
+/*
+|--------------------------------------------------------------------------
+| BUKTI FOTO DAN GPS PRESENSI
+|--------------------------------------------------------------------------
+|
+| Admin dan Pimpinan dapat melihat seluruh bukti.
+| Personel hanya dapat melihat bukti miliknya sendiri.
+|
+*/
+Route::middleware([
+    'auth',
+    'active',
+    EnsurePasswordIsChanged::class,
+])
+    ->prefix('bukti-presensi')
+    ->name('attendance.evidence.')
+    ->group(function () {
+        /*
+         * Halaman detail presensi.
+         */
+        Route::get(
+            '/{attendance}',
+            [
+                AttendanceEvidenceController::class,
+                'show',
+            ]
+        )->name('show');
+
+        /*
+         * Mengirim foto privat check-in
+         * atau check-out.
+         */
+        Route::get(
+            '/{attendance}/foto/{type}',
+            [
+                AttendanceEvidenceController::class,
+                'photo',
+            ]
+        )
+            ->where(
+                'type',
+                'checkin|checkout'
+            )
+            ->name('photo');
     });

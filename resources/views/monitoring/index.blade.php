@@ -407,6 +407,24 @@
                                 </td>
 
                                 <td class="text-end px-4">
+                                    {{-- Tombol hanya muncul apabila Personel
+     sudah mempunyai data presensi. --}}
+@if ($member->attendance)
+    <a
+        href="{{
+            route(
+                'attendance.evidence.show',
+                [
+                    'attendance' =>
+                        $member->attendance->id,
+                ]
+            )
+        }}"
+        class="btn btn-sm btn-outline-success"
+    >
+        Foto & GPS
+    </a>
+@endif
                                     @if (
                                         $report
                                         && $report->status !== 'draft'
