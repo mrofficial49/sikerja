@@ -1,91 +1,1057 @@
-/* Memuat seluruh CSS Bootstrap. */
 @import 'bootstrap/dist/css/bootstrap.min.css';
 
-/* Warna utama aplikasi SIKERJA. */
+/* =========================================================
+   IDENTITAS WARNA SIKERJA
+========================================================= */
 :root {
-    --sikerja-green-dark: #183c2c;
-    --sikerja-green: #285943;
-    --sikerja-green-light: #eaf3ee;
-    --sikerja-gold: #c7a44a;
-    --sikerja-bg: #f4f7f5;
+    --sikerja-green-950: #10291e;
+    --sikerja-green-900: #173b2b;
+    --sikerja-green-800: #204d38;
+    --sikerja-green-700: #2d6349;
+    --sikerja-green-100: #e8f1ec;
+    --sikerja-green-50: #f4f8f5;
+
+    --sikerja-gold: #d0aa55;
+    --sikerja-gold-soft: #f4ead2;
+
+    --sikerja-text: #26332d;
+    --sikerja-muted: #6f7d75;
+    --sikerja-border: #dfe7e2;
+    --sikerja-background: #f3f6f4;
+    --sikerja-white: #ffffff;
+
+    --sikerja-sidebar-width: 280px;
+    --sikerja-topbar-height: 82px;
+
+    --sikerja-shadow-sm:
+        0 8px 24px rgba(22, 57, 41, 0.07);
+
+    --sikerja-shadow-md:
+        0 18px 45px rgba(22, 57, 41, 0.12);
 }
 
-/* Pengaturan dasar halaman. */
+/* =========================================================
+   DASAR HALAMAN
+========================================================= */
+* {
+    box-sizing: border-box;
+}
+
+html {
+    min-height: 100%;
+}
+
 body {
     min-height: 100vh;
-    background-color: var(--sikerja-bg);
-    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    color: var(--sikerja-text);
+    background: var(--sikerja-background);
+    font-family:
+        Inter,
+        ui-sans-serif,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Arial,
+        sans-serif;
+    -webkit-font-smoothing: antialiased;
 }
 
-/* Latar belakang halaman login. */
-.login-page {
+a {
+    text-decoration: none;
+}
+
+/* =========================================================
+   LAYOUT APLIKASI
+========================================================= */
+.sikerja-app-shell {
     min-height: 100vh;
-    background:
-        linear-gradient(
-            135deg,
-            rgba(24, 60, 44, 0.97),
-            rgba(40, 89, 67, 0.92)
-        );
 }
 
-/* Kotak login. */
-.login-card {
-    border: 0;
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+.sikerja-sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 1040;
+    width: var(--sikerja-sidebar-width);
+    min-height: 100vh;
+    flex-direction: column;
+    color: white;
+    background:
+        radial-gradient(
+            circle at top right,
+            rgba(208, 170, 85, 0.16),
+            transparent 28%
+        ),
+        linear-gradient(
+            180deg,
+            var(--sikerja-green-950),
+            var(--sikerja-green-900)
+        );
+    box-shadow:
+        12px 0 35px rgba(16, 41, 30, 0.12);
 }
 
-/* Bagian informasi aplikasi. */
-.login-brand-panel {
-    min-height: 560px;
-    background:
-        linear-gradient(
-            160deg,
-            rgba(18, 52, 37, 0.97),
-            rgba(44, 92, 69, 0.94)
-        );
+.sikerja-main {
+    min-height: 100vh;
+    margin-left: var(--sikerja-sidebar-width);
+}
+
+.sikerja-content {
+    min-height: calc(
+        100vh - var(--sikerja-topbar-height)
+    );
+}
+
+.sikerja-content-inner {
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 30px 34px 46px;
+}
+
+/* =========================================================
+   IDENTITAS SIDEBAR
+========================================================= */
+.sikerja-sidebar-brand {
+    padding: 28px 25px 22px;
+}
+
+.sikerja-brand-link {
+    display: flex;
+    align-items: center;
+    gap: 13px;
     color: white;
 }
 
-/* Logo sementara berbentuk lingkaran. */
-.brand-logo {
-    width: 86px;
-    height: 86px;
+.sikerja-brand-link:hover {
+    color: white;
+}
+
+.sikerja-brand-link > span:last-child {
+    display: flex;
+    flex-direction: column;
+}
+
+.sikerja-brand-link strong {
+    font-size: 20px;
+    line-height: 1.1;
+    letter-spacing: 0.12em;
+}
+
+.sikerja-brand-link small {
+    margin-top: 5px;
+    color: rgba(255, 255, 255, 0.58);
+    font-size: 10px;
+    letter-spacing: 0.04em;
+}
+
+.sikerja-brand-mark {
+    width: 48px;
+    height: 52px;
+    flex: 0 0 48px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     border: 2px solid var(--sikerja-gold);
-    border-radius: 50%;
+    border-radius: 14px 14px 18px 18px;
     color: var(--sikerja-gold);
-    font-size: 28px;
-    font-weight: bold;
+    background: rgba(255, 255, 255, 0.05);
+    font-size: 21px;
+    font-weight: 900;
+    box-shadow:
+        inset 0 0 20px rgba(208, 170, 85, 0.06);
 }
 
-/* Tombol utama aplikasi. */
-.btn-sikerja {
-    background-color: var(--sikerja-green);
-    border-color: var(--sikerja-green);
+.sikerja-sidebar-section-title {
+    padding: 5px 26px 11px;
+    color: rgba(255, 255, 255, 0.38);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.sikerja-sidebar-navigation {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 0 15px;
+}
+
+.sikerja-nav-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.sikerja-nav-link {
+    position: relative;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 14px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    color: rgba(255, 255, 255, 0.68);
+    font-size: 14px;
+    font-weight: 600;
+    transition:
+        background 0.18s ease,
+        border-color 0.18s ease,
+        color 0.18s ease,
+        transform 0.18s ease;
+}
+
+.sikerja-nav-link:hover {
     color: white;
+    background: rgba(255, 255, 255, 0.07);
+    transform: translateX(2px);
+}
+
+.sikerja-nav-link.active {
+    border-color: rgba(208, 170, 85, 0.22);
+    color: white;
+    background:
+        linear-gradient(
+            90deg,
+            rgba(208, 170, 85, 0.20),
+            rgba(255, 255, 255, 0.07)
+        );
+}
+
+.sikerja-nav-indicator {
+    width: 8px;
+    height: 8px;
+    flex: 0 0 8px;
+    border: 2px solid rgba(255, 255, 255, 0.36);
+    border-radius: 50%;
+}
+
+.sikerja-nav-link.active
+.sikerja-nav-indicator {
+    border-color: var(--sikerja-gold);
+    background: var(--sikerja-gold);
+    box-shadow:
+        0 0 0 5px rgba(208, 170, 85, 0.12);
+}
+
+.sikerja-nav-label {
+    flex: 1;
+}
+
+.sikerja-nav-badge {
+    min-width: 25px;
+    padding: 4px 7px;
+    border-radius: 999px;
+    color: white;
+    background: #c94e4e;
+    font-size: 10px;
+    font-weight: 800;
+    text-align: center;
+}
+
+/* =========================================================
+   PROFIL SIDEBAR
+========================================================= */
+.sikerja-sidebar-footer {
+    padding: 18px 20px 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sikerja-user-card {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+}
+
+.sikerja-user-avatar,
+.sikerja-profile-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    color: var(--sikerja-green-950);
+    background:
+        linear-gradient(
+            145deg,
+            #ead7a7,
+            var(--sikerja-gold)
+        );
+    font-weight: 900;
+}
+
+.sikerja-user-avatar {
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+}
+
+.sikerja-profile-avatar {
+    width: 39px;
+    height: 39px;
+    flex: 0 0 39px;
+}
+
+.sikerja-user-information,
+.sikerja-topbar-profile > div:last-child {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.sikerja-user-information strong,
+.sikerja-topbar-profile strong {
+    overflow: hidden;
+    font-size: 13px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.sikerja-user-information small {
+    color: rgba(255, 255, 255, 0.52);
+    font-size: 11px;
+}
+
+.sikerja-logout-button {
+    width: 100%;
+    margin-top: 15px;
+    padding: 10px 14px;
+    border: 1px solid rgba(255, 255, 255, 0.13);
+    border-radius: 11px;
+    color: rgba(255, 255, 255, 0.74);
+    background: rgba(255, 255, 255, 0.04);
+    font-size: 12px;
+    font-weight: 700;
+    transition: 0.18s ease;
+}
+
+.sikerja-logout-button:hover {
+    border-color: rgba(255, 255, 255, 0.24);
+    color: white;
+    background: rgba(255, 255, 255, 0.09);
+}
+
+/* =========================================================
+   TOPBAR
+========================================================= */
+.sikerja-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+    height: var(--sikerja-topbar-height);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 0 34px;
+    border-bottom: 1px solid
+        rgba(223, 231, 226, 0.9);
+    background: rgba(255, 255, 255, 0.93);
+    box-shadow:
+        0 6px 24px rgba(22, 57, 41, 0.04);
+    backdrop-filter: blur(16px);
+}
+
+.sikerja-topbar-eyebrow {
+    display: block;
+    margin-bottom: 2px;
+    color: var(--sikerja-green-700);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.sikerja-topbar-title {
+    max-width: 500px;
+    overflow: hidden;
+    color: var(--sikerja-green-950);
+    font-size: 16px;
+    font-weight: 800;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.sikerja-topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.sikerja-topbar-profile {
+    align-items: center;
+    gap: 10px;
+    padding-left: 14px;
+    border-left: 1px solid var(--sikerja-border);
+}
+
+.sikerja-topbar-profile strong {
+    max-width: 210px;
+    color: var(--sikerja-text);
+}
+
+.sikerja-topbar-profile small {
+    max-width: 210px;
+    overflow: hidden;
+    color: var(--sikerja-muted);
+    font-size: 10px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.sikerja-notification-button {
+    position: relative;
+    width: 42px;
+    height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--sikerja-border);
+    border-radius: 13px;
+    color: var(--sikerja-green-700);
+    background: white;
+}
+
+.notification-symbol {
+    font-size: 13px;
+}
+
+.sikerja-notification-count {
+    position: absolute;
+    top: -6px;
+    right: -7px;
+    min-width: 21px;
+    padding: 3px 5px;
+    border: 2px solid white;
+    border-radius: 999px;
+    color: white;
+    background: #c94e4e;
+    font-size: 9px;
+    font-weight: 900;
+    text-align: center;
+}
+
+.sikerja-mobile-menu-button {
+    width: 42px;
+    height: 42px;
+    padding: 10px;
+    border: 1px solid var(--sikerja-border);
+    border-radius: 12px;
+    background: white;
+}
+
+.sikerja-mobile-menu-button span {
+    width: 100%;
+    height: 2px;
+    display: block;
+    margin: 4px 0;
+    border-radius: 10px;
+    background: var(--sikerja-green-900);
+}
+
+/* =========================================================
+   OFFCANVAS MOBILE
+========================================================= */
+.sikerja-mobile-sidebar {
+    width: min(86vw, 320px) !important;
+    color: white;
+    background:
+        linear-gradient(
+            180deg,
+            var(--sikerja-green-950),
+            var(--sikerja-green-900)
+        );
+}
+
+.sikerja-mobile-sidebar .offcanvas-header {
+    padding: 23px;
+    border-bottom: 1px solid
+        rgba(255, 255, 255, 0.08);
+}
+
+.sikerja-mobile-sidebar .offcanvas-body {
+    display: flex;
+    flex-direction: column;
+    padding: 20px 15px 24px;
+}
+
+.sikerja-mobile-user {
+    padding: 20px 7px 0;
+}
+
+/* =========================================================
+   KOMPONEN BOOTSTRAP
+========================================================= */
+.card {
+    border-color: var(--sikerja-border);
+    border-radius: 18px;
+    box-shadow: var(--sikerja-shadow-sm);
+}
+
+.card-header {
+    border-bottom-color: var(--sikerja-border);
+    border-radius: 18px 18px 0 0 !important;
+}
+
+.card-body {
+    padding: 22px;
+}
+
+.shadow-sm {
+    box-shadow: var(--sikerja-shadow-sm) !important;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: var(--sikerja-green-950);
+    letter-spacing: -0.02em;
+}
+
+.text-secondary {
+    color: var(--sikerja-muted) !important;
+}
+
+.btn {
+    border-radius: 11px;
+    font-weight: 700;
+}
+
+.btn-sikerja,
+.btn-primary {
+    border-color: var(--sikerja-green-700);
+    color: white;
+    background: var(--sikerja-green-700);
 }
 
 .btn-sikerja:hover,
-.btn-sikerja:focus {
-    background-color: var(--sikerja-green-dark);
-    border-color: var(--sikerja-green-dark);
+.btn-sikerja:focus,
+.btn-primary:hover,
+.btn-primary:focus {
+    border-color: var(--sikerja-green-900);
     color: white;
+    background: var(--sikerja-green-900);
 }
 
-/* Navbar dashboard. */
-.navbar-sikerja {
-    background-color: var(--sikerja-green-dark);
+.btn-outline-primary {
+    border-color: var(--sikerja-green-700);
+    color: var(--sikerja-green-700);
 }
 
-/* Tampilan pada layar HP. */
+.btn-outline-primary:hover {
+    border-color: var(--sikerja-green-700);
+    color: white;
+    background: var(--sikerja-green-700);
+}
+
+.form-control,
+.form-select {
+    min-height: 46px;
+    border-color: var(--sikerja-border);
+    border-radius: 11px;
+    background-color: #fbfcfb;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--sikerja-green-700);
+    box-shadow:
+        0 0 0 4px rgba(45, 99, 73, 0.11);
+}
+
+.form-label {
+    color: var(--sikerja-green-950);
+    font-size: 13px;
+}
+
+.table {
+    --bs-table-bg: transparent;
+    margin-bottom: 0;
+}
+
+.table thead th {
+    padding-top: 13px;
+    padding-bottom: 13px;
+    border-bottom-width: 1px;
+    color: var(--sikerja-muted);
+    background: var(--sikerja-green-50);
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.table tbody td {
+    padding-top: 14px;
+    padding-bottom: 14px;
+    border-color: #edf1ee;
+    vertical-align: middle;
+}
+
+.badge {
+    padding: 7px 10px;
+    border-radius: 999px;
+    font-weight: 700;
+}
+
+.sikerja-alert {
+    border: 0;
+    border-radius: 14px;
+    box-shadow: var(--sikerja-shadow-sm);
+}
+
+/* =========================================================
+   LOGIN
+========================================================= */
+.login-page {
+    min-height: 100vh;
+    padding: 34px 0;
+    display: flex;
+    align-items: center;
+    background:
+        radial-gradient(
+            circle at 90% 10%,
+            rgba(208, 170, 85, 0.20),
+            transparent 30%
+        ),
+        radial-gradient(
+            circle at 10% 90%,
+            rgba(255, 255, 255, 0.07),
+            transparent 26%
+        ),
+        linear-gradient(
+            140deg,
+            #0f281d,
+            #1e5039
+        );
+}
+
+.login-shell {
+    width: min(1120px, calc(100% - 32px));
+    margin: auto;
+    overflow: hidden;
+    border: 1px solid
+        rgba(255, 255, 255, 0.14);
+    border-radius: 28px;
+    background: white;
+    box-shadow:
+        0 38px 90px rgba(7, 28, 19, 0.38);
+}
+
+.login-brand-panel {
+    position: relative;
+    min-height: 650px;
+    overflow: hidden;
+    color: white;
+    background:
+        linear-gradient(
+            150deg,
+            rgba(15, 40, 29, 0.98),
+            rgba(35, 87, 62, 0.94)
+        );
+}
+
+.login-brand-panel::before,
+.login-brand-panel::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+}
+
+.login-brand-panel::before {
+    width: 340px;
+    height: 340px;
+    top: -170px;
+    right: -140px;
+    border: 1px solid
+        rgba(255, 255, 255, 0.13);
+}
+
+.login-brand-panel::after {
+    width: 240px;
+    height: 240px;
+    bottom: -120px;
+    left: -100px;
+    background: rgba(208, 170, 85, 0.10);
+}
+
+.login-brand-content {
+    position: relative;
+    z-index: 1;
+    max-width: 480px;
+}
+
+.login-logo {
+    width: 64px;
+    height: 70px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--sikerja-gold);
+    border-radius: 18px 18px 23px 23px;
+    color: var(--sikerja-gold);
+    background: rgba(255, 255, 255, 0.04);
+    font-size: 26px;
+    font-weight: 900;
+}
+
+.login-feature-list {
+    display: grid;
+    gap: 12px;
+    margin-top: 38px;
+}
+
+.login-feature-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: rgba(255, 255, 255, 0.76);
+    font-size: 13px;
+}
+
+.login-feature-item span {
+    width: 24px;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid
+        rgba(208, 170, 85, 0.38);
+    border-radius: 8px;
+    color: var(--sikerja-gold);
+    font-size: 10px;
+}
+
+.login-form-panel {
+    min-height: 650px;
+    display: flex;
+    align-items: center;
+    background: white;
+}
+
+.login-form-wrapper {
+    width: 100%;
+    max-width: 430px;
+    margin: auto;
+}
+
+.login-form-heading {
+    margin-bottom: 30px;
+}
+
+.login-form-heading h2 {
+    margin-bottom: 9px;
+    font-size: 31px;
+    font-weight: 850;
+}
+
+.login-submit-button {
+    min-height: 52px;
+    border-radius: 13px;
+    box-shadow:
+        0 12px 25px rgba(45, 99, 73, 0.20);
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
 @media (max-width: 991.98px) {
-    .login-brand-panel {
+    .sikerja-main {
+        margin-left: 0;
+    }
+
+    .sikerja-topbar {
+        padding: 0 20px;
+    }
+
+    .sikerja-content-inner {
+        padding: 24px 18px 36px;
+    }
+
+    .login-brand-panel,
+    .login-form-panel {
         min-height: auto;
-        padding-top: 40px !important;
-        padding-bottom: 40px !important;
+    }
+
+    .login-brand-panel {
+        padding-top: 48px !important;
+        padding-bottom: 48px !important;
+    }
+
+    .login-form-panel {
+        padding-top: 50px !important;
+        padding-bottom: 50px !important;
+    }
+}
+
+@media (max-width: 575.98px) {
+    :root {
+        --sikerja-topbar-height: 72px;
+    }
+
+    .sikerja-topbar {
+        padding: 0 14px;
+    }
+
+    .sikerja-topbar-eyebrow {
+        display: none;
+    }
+
+    .sikerja-topbar-title {
+        max-width: 190px;
+        font-size: 13px;
+    }
+
+    .sikerja-content-inner {
+        padding: 19px 13px 30px;
+    }
+
+    .card {
+        border-radius: 15px;
+    }
+
+    .card-body {
+        padding: 18px;
+    }
+
+    .login-shell {
+        width: calc(100% - 20px);
+        border-radius: 21px;
+    }
+
+    .login-brand-panel,
+    .login-form-panel {
+        padding: 34px 25px !important;
+    }
+
+    .login-form-heading h2 {
+        font-size: 27px;
+    }
+}
+
+/* =========================================================
+   LOGO SIKERJA
+========================================================= */
+
+/* Logo di sidebar desktop dan mobile */
+.sikerja-brand-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+/* Wadah logo sidebar */
+.sikerja-brand-mark {
+    overflow: hidden;
+    padding: 6px;
+}
+
+/* Logo pada halaman login */
+.login-logo-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+/* Wadah logo login */
+.login-logo {
+    overflow: hidden;
+    padding: 8px;
+}
+
+/* =========================================================
+   PENGUAT IDENTITAS LOGO SIKERJA
+   Diletakkan di bagian paling bawah agar menimpa
+   pengaturan logo sebelumnya.
+========================================================= */
+
+/* Panel identitas utama pada sidebar. */
+.sikerja-sidebar-brand {
+    padding: 20px 16px 18px;
+}
+
+/* Kotak khusus yang menampung logo dan nama aplikasi. */
+.sikerja-sidebar-brand .sikerja-brand-link {
+    position: relative;
+    gap: 15px;
+    padding: 16px;
+    overflow: hidden;
+    border: 1px solid rgba(208, 170, 85, 0.28);
+    border-radius: 20px;
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255, 255, 255, 0.10),
+            rgba(255, 255, 255, 0.035)
+        );
+    box-shadow:
+        0 14px 32px rgba(0, 0, 0, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.10);
+}
+
+/* Garis emas sebagai aksen identitas. */
+.sikerja-sidebar-brand .sikerja-brand-link::after {
+    content: "";
+    position: absolute;
+    right: 18px;
+    bottom: 0;
+    left: 18px;
+    height: 3px;
+    border-radius: 999px 999px 0 0;
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            #d0aa55,
+            transparent
+        );
+}
+
+/* Wadah logo pada sidebar diperbesar. */
+.sikerja-sidebar-brand .sikerja-brand-mark {
+    width: 76px;
+    height: 82px;
+    flex: 0 0 76px;
+    padding: 8px;
+    overflow: hidden;
+    border: 2px solid #d0aa55;
+    border-radius: 20px 20px 25px 25px;
+    background: #ffffff;
+    box-shadow:
+        0 12px 26px rgba(0, 0, 0, 0.22),
+        0 0 0 5px rgba(208, 170, 85, 0.08);
+}
+
+/* Gambar logo memenuhi wadah tanpa terpotong. */
+.sikerja-sidebar-brand .sikerja-brand-image {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+    transform: scale(1.06);
+}
+
+/* Nama SIKERJA dibuat lebih dominan. */
+.sikerja-sidebar-brand .sikerja-brand-link strong {
+    color: #ffffff;
+    font-size: 23px;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: 0.13em;
+    text-shadow: 0 3px 12px rgba(0, 0, 0, 0.20);
+}
+
+/* Subjudul aplikasi. */
+.sikerja-sidebar-brand .sikerja-brand-link small {
+    max-width: 125px;
+    margin-top: 8px;
+    color: rgba(255, 255, 255, 0.64);
+    font-size: 10px;
+    line-height: 1.45;
+    letter-spacing: 0.03em;
+}
+
+/* =========================================================
+   LOGO PADA SIDEBAR MOBILE
+========================================================= */
+
+.sikerja-mobile-sidebar .sikerja-brand-mark {
+    width: 58px;
+    height: 64px;
+    flex: 0 0 58px;
+    padding: 6px;
+    overflow: hidden;
+    border: 2px solid #d0aa55;
+    border-radius: 16px 16px 20px 20px;
+    background: #ffffff;
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.20);
+}
+
+.sikerja-mobile-sidebar .sikerja-brand-image {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+}
+
+/* =========================================================
+   LOGO UTAMA PADA HALAMAN LOGIN
+========================================================= */
+
+.login-logo {
+    position: relative;
+    width: 118px;
+    height: 128px;
+    padding: 12px;
+    overflow: visible;
+    border: 3px solid #d0aa55;
+    border-radius: 28px 28px 36px 36px;
+    background: #ffffff;
+    box-shadow:
+        0 22px 45px rgba(0, 0, 0, 0.30),
+        0 0 0 8px rgba(208, 170, 85, 0.08);
+}
+
+/* Efek cahaya lembut di belakang logo login. */
+.login-logo::before {
+    content: "";
+    position: absolute;
+    inset: -20px;
+    z-index: -1;
+    border-radius: 50%;
+    background:
+        radial-gradient(
+            circle,
+            rgba(208, 170, 85, 0.22),
+            transparent 68%
+        );
+}
+
+/* Gambar logo login. */
+.login-logo-image {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+    transform: scale(1.06);
+}
+
+/* Nama aplikasi pada login dibuat lebih menonjol. */
+.login-brand-content h1 {
+    margin-top: 6px;
+    font-size: clamp(42px, 5vw, 62px);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: 0.06em;
+    text-shadow: 0 5px 20px rgba(0, 0, 0, 0.20);
+}
+
+/* Penyesuaian ukuran pada layar kecil. */
+@media (max-width: 991.98px) {
+    .login-logo {
+        width: 96px;
+        height: 104px;
+    }
+
+    .login-brand-content h1 {
+        font-size: 42px;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .login-logo {
+        width: 82px;
+        height: 90px;
+        padding: 9px;
+        border-radius: 21px 21px 27px 27px;
+    }
+
+    .login-brand-content h1 {
+        font-size: 35px;
     }
 }

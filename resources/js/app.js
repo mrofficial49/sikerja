@@ -2,7 +2,6 @@
 import './bootstrap';
 
 // Memuat CSS utama aplikasi.
-import '../css/app.css';
 
 // Memuat komponen JavaScript Bootstrap,
 // seperti modal, dropdown, toast, dan collapse.

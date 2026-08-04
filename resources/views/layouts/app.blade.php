@@ -8,299 +8,370 @@
         content="width=device-width, initial-scale=1"
     >
 
+    <meta name="theme-color" content="#173b2b">
+
     <title>@yield('title', 'SIKERJA')</title>
 
-    @vite('resources/js/app.js')
+    @vite([
+        'resources/css/app.css',
+        'resources/js/app.js',
+    ])
 </head>
 
-<body>
-<nav class="navbar navbar-expand-lg navbar-dark navbar-sikerja">
-    <div class="container">
-        <a
-            class="navbar-brand fw-bold"
-            href="{{ route('dashboard') }}"
-        >
-            SIKERJA
-        </a>
+<body class="sikerja-app-body">
+@php
+    /*
+     * Data pengguna yang sedang login.
+     */
+    $authenticatedUser = auth()->user();
 
-        <button
-            class="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#mainNavigation"
-            aria-controls="mainNavigation"
-            aria-expanded="false"
-            aria-label="Buka navigasi"
-        >
-            <span class="navbar-toggler-icon"></span>
-        </button>
+    /*
+     * Jumlah notifikasi yang belum dibaca.
+     */
+    $navbarUnreadNotificationCount = $authenticatedUser
+        ->appNotifications()
+        ->unread()
+        ->count();
+@endphp
 
-        <div
-            class="collapse navbar-collapse"
-            id="mainNavigation"
-        >
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                {{-- ======================================================
-     MENU NOTIFIKASI UNTUK SEMUA PENGGUNA
-====================================================== --}}
-@if (auth()->check())
-    @php
-        /*
-         * Menghitung notifikasi yang belum dibaca
-         * milik pengguna yang sedang login.
-         */
-        $navbarUnreadNotificationCount = auth()
-            ->user()
-            ->appNotifications()
-            ->unread()
-            ->count();
-    @endphp
+<div class="sikerja-app-shell">
 
-    <li class="nav-item">
-        <a
-            href="{{ route('notifications.index') }}"
-            class="nav-link
-                {{
-                    request()->routeIs('notifications.*')
-                        ? 'active'
-                        : ''
-                }}"
-        >
-            Notifikasi
+    {{-- =====================================================
+         SIDEBAR DESKTOP
+    ====================================================== --}}
+    <aside class="sikerja-sidebar d-none d-lg-flex">
+        <div class="sikerja-sidebar-brand">
+            <a
+                href="{{ route('dashboard') }}"
+                class="sikerja-brand-link"
+            >
+               {{-- Logo SIKERJA versi mobile --}}
+<span class="sikerja-brand-mark">
+    <img
+        src="{{ asset('images/logo-sikerja.png') }}"
+        alt="Logo SIKERJA"
+        class="sikerja-brand-image"
+    >
+</span>
 
-            @if ($navbarUnreadNotificationCount > 0)
-                <span class="badge text-bg-danger ms-1">
-                    {{
-                        $navbarUnreadNotificationCount > 99
-                            ? '99+'
-                            : $navbarUnreadNotificationCount
-                    }}
-                </span>
-            @endif
-        </a>
-    </li>
-@endif
-                <li class="nav-item">
-                    <a
-                        class="nav-link
-                        {{ request()->routeIs('*.dashboard')
-                            ? 'active'
-                            : '' }}"
-                        href="{{ route('dashboard') }}"
-                    >
-                        Dashboard
-                    </a>
-                </li>
+                <span>
+                    <strong>SIKERJA</strong>
 
-                {{-- Menu khusus Admin. --}}
-                @if (auth()->user()->isAdmin())
-                    <li class="nav-item">
-                        <a
-                            class="nav-link
-                            {{ request()->routeIs('admin.units.*')
-                                ? 'active'
-                                : '' }}"
-                            href="{{ route('admin.units.index') }}"
-                        >
-                            Unit Kerja
-                        </a>
-                    </li>
-
-
-                    <li class="nav-item">
-                        <a
-                            class="nav-link
-                            {{ request()->routeIs('admin.users.*')
-                                ? 'active'
-                                : '' }}"
-                            href="{{ route('admin.users.index') }}"
-                        >
-                            Pengguna
-                        </a>
-                    </li>
-
-
-                    <li class="nav-item">
-                        <a
-                            class="nav-link
-                            {{ request()->routeIs('admin.wfh-schedules.*')
-                                ? 'active'
-                                : '' }}"
-                            href="{{ route('admin.wfh-schedules.index') }}"
-                        >
-                            Jadwal WFH
-                        </a>
-                    </li>
-                @endif
-                {{-- ======================================================
-     MENU VERIFIKASI LAPORAN
-     Hanya ditampilkan untuk Admin dan Pimpinan
-====================================================== --}}
-
-@if (auth()->check())
-
-    {{-- Menu khusus Admin --}}
-    {{-- ======================================================
-     MENU KHUSUS ADMIN
-====================================================== --}}
-@if (
-    auth()->check()
-    && auth()->user()->role?->name === 'Admin'
-)
-
-    {{-- Menu untuk melihat rekap presensi dan laporan. --}}
-    <li class="nav-item">
-        <a
-            href="{{ route('admin.monitoring.index') }}"
-            class="nav-link
-                {{ request()->routeIs('admin.monitoring.*')
-                    ? 'active'
-                    : '' }}"
-        >
-            Monitoring & Rekap
-        </a>
-    </li>
-
-    {{-- Menu untuk memeriksa laporan Personel. --}}
-    <li class="nav-item">
-        <a
-            href="{{ route('admin.reports.index') }}"
-            class="nav-link
-                {{ request()->routeIs('admin.reports.*')
-                    ? 'active'
-                    : '' }}"
-        >
-            Verifikasi Laporan
-        </a>
-    </li>
-
-@endif
-
-   {{-- ======================================================
-     MENU KHUSUS PIMPINAN
-====================================================== --}}
-{{-- ======================================================
-     MENU KHUSUS PIMPINAN
-====================================================== --}}
-@if (
-    auth()->check()
-    && auth()->user()->role?->name === 'Pimpinan'
-)
-
-    {{-- Menu untuk memberikan tugas kepada Personel. --}}
-    <li class="nav-item">
-        <a
-            href="{{ route('leader.tasks.index') }}"
-            class="nav-link
-                {{ request()->routeIs('leader.tasks.*')
-                    ? 'active'
-                    : '' }}"
-        >
-            Tugas Personel
-        </a>
-    </li>
-
-    {{-- Menu untuk melihat rekap presensi dan laporan. --}}
-    <li class="nav-item">
-        <a
-            href="{{ route('leader.monitoring.index') }}"
-            class="nav-link
-                {{ request()->routeIs('leader.monitoring.*')
-                    ? 'active'
-                    : '' }}"
-        >
-            Monitoring & Rekap
-        </a>
-    </li>
-
-    {{-- Menu untuk memeriksa laporan Personel. --}}
-    <li class="nav-item">
-        <a
-            href="{{ route('leader.reports.index') }}"
-            class="nav-link
-                {{ request()->routeIs('leader.reports.*')
-                    ? 'active'
-                    : '' }}"
-        >
-            Verifikasi Laporan
-        </a>
-    </li>
-
-@endif
-
-@endif
-            </ul>
-
-            <div class="d-flex align-items-center gap-3">
-                <div class="text-white text-end d-none d-lg-block">
-                    <div class="fw-semibold">
-                        {{ auth()->user()->name }}
-                    </div>
-
-                    <small class="text-white-50">
-                        {{ auth()->user()->role?->name ?? '-' }}
+                    <small>
+                        Sistem Kinerja Personel
                     </small>
+                </span>
+            </a>
+        </div>
+
+        <div class="sikerja-sidebar-section-title">
+            Menu Utama
+        </div>
+
+        <div class="sikerja-sidebar-navigation">
+            @include(
+                'layouts.partials.sidebar-menu'
+            )
+        </div>
+
+        <div class="sikerja-sidebar-footer">
+            <div class="sikerja-user-card">
+                <div class="sikerja-user-avatar">
+                    {{
+                        strtoupper(
+                            substr(
+                                $authenticatedUser->name,
+                                0,
+                                1
+                            )
+                        )
+                    }}
                 </div>
 
-                <form
-                    method="POST"
-                    action="{{ route('logout') }}"
-                    onsubmit="
-                        return confirm(
-                            'Apakah Anda yakin ingin keluar?'
-                        )
-                    "
-                >
-                    @csrf
+                <div class="sikerja-user-information">
+                    <strong>
+                        {{ $authenticatedUser->name }}
+                    </strong>
 
-                    <button
-                        type="submit"
-                        class="btn btn-outline-light btn-sm"
-                    >
-                        Keluar
-                    </button>
-                </form>
+                    <small>
+                        {{
+                            $authenticatedUser->role?->name
+                            ?? '-'
+                        }}
+                    </small>
+                </div>
             </div>
+
+            <form
+                method="POST"
+                action="{{ route('logout') }}"
+                onsubmit="
+                    return confirm(
+                        'Apakah Anda yakin ingin keluar?'
+                    )
+                "
+            >
+                @csrf
+
+                <button
+                    type="submit"
+                    class="sikerja-logout-button"
+                >
+                    Keluar dari Sistem
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    {{-- =====================================================
+         AREA UTAMA
+    ====================================================== --}}
+    <div class="sikerja-main">
+
+        {{-- Topbar --}}
+        <header class="sikerja-topbar">
+            <div class="d-flex align-items-center gap-3">
+                <button
+                    type="button"
+                    class="sikerja-mobile-menu-button
+                           d-lg-none"
+                    data-bs-toggle="offcanvas"
+                    data-bs-target="#mobileSidebar"
+                    aria-controls="mobileSidebar"
+                    aria-label="Buka menu"
+                >
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+
+                <div>
+                    <small class="sikerja-topbar-eyebrow">
+                        Sistem Informasi Kinerja
+                    </small>
+
+                    <div class="sikerja-topbar-title">
+                        @yield('title', 'SIKERJA')
+                    </div>
+                </div>
+            </div>
+
+            <div class="sikerja-topbar-actions">
+                <a
+                    href="{{ route('notifications.index') }}"
+                    class="sikerja-notification-button"
+                    aria-label="Notifikasi"
+                >
+                    <span class="notification-symbol">
+                        ●
+                    </span>
+
+                    @if (
+                        $navbarUnreadNotificationCount > 0
+                    )
+                        <span
+                            class="sikerja-notification-count"
+                        >
+                            {{
+                                $navbarUnreadNotificationCount
+                                    > 99
+                                    ? '99+'
+                                    : $navbarUnreadNotificationCount
+                            }}
+                        </span>
+                    @endif
+                </a>
+
+                <div
+                    class="sikerja-topbar-profile
+                           d-none d-sm-flex"
+                >
+                    <div class="sikerja-profile-avatar">
+                        {{
+                            strtoupper(
+                                substr(
+                                    $authenticatedUser->name,
+                                    0,
+                                    1
+                                )
+                            )
+                        }}
+                    </div>
+
+                    <div>
+                        <strong>
+                            {{ $authenticatedUser->name }}
+                        </strong>
+
+                        <small>
+                            {{
+                                $authenticatedUser
+                                    ->unit
+                                    ?->name
+                                ?? $authenticatedUser
+                                    ->role
+                                    ?->name
+                                ?? '-'
+                            }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        {{-- Konten --}}
+        <main class="sikerja-content">
+            <div class="sikerja-content-inner">
+
+                {{-- Pesan berhasil --}}
+                @if (session('success'))
+                    <div
+                        class="alert alert-success
+                               alert-dismissible fade show
+                               sikerja-alert"
+                        role="alert"
+                    >
+                        {{ session('success') }}
+
+                        <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="alert"
+                            aria-label="Tutup"
+                        ></button>
+                    </div>
+                @endif
+
+                {{-- Pesan kesalahan --}}
+                @if (session('error'))
+                    <div
+                        class="alert alert-danger
+                               alert-dismissible fade show
+                               sikerja-alert"
+                        role="alert"
+                    >
+                        {{ session('error') }}
+
+                        <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="alert"
+                            aria-label="Tutup"
+                        ></button>
+                    </div>
+                @endif
+
+                {{-- Pesan peringatan --}}
+                @if (session('warning'))
+                    <div
+                        class="alert alert-warning
+                               alert-dismissible fade show
+                               sikerja-alert"
+                        role="alert"
+                    >
+                        {{ session('warning') }}
+
+                        <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="alert"
+                            aria-label="Tutup"
+                        ></button>
+                    </div>
+                @endif
+
+                @yield('content')
+            </div>
+        </main>
+    </div>
+</div>
+
+{{-- =====================================================
+     SIDEBAR MOBILE
+====================================================== --}}
+<div
+    class="offcanvas offcanvas-start
+           sikerja-mobile-sidebar"
+    tabindex="-1"
+    id="mobileSidebar"
+    aria-labelledby="mobileSidebarLabel"
+>
+    <div class="offcanvas-header">
+        <div
+            id="mobileSidebarLabel"
+            class="sikerja-brand-link"
+        >
+            <span class="sikerja-brand-mark">
+                S
+            </span>
+
+            <span>
+                <strong>SIKERJA</strong>
+                <small>Sistem Kinerja Personel</small>
+            </span>
+        </div>
+
+        <button
+            type="button"
+            class="btn-close btn-close-white"
+            data-bs-dismiss="offcanvas"
+            aria-label="Tutup"
+        ></button>
+    </div>
+
+    <div class="offcanvas-body">
+        <div class="sikerja-sidebar-section-title">
+            Menu Utama
+        </div>
+
+        @include(
+            'layouts.partials.sidebar-menu'
+        )
+
+        <div class="sikerja-mobile-user mt-auto">
+            <div class="sikerja-user-card">
+                <div class="sikerja-user-avatar">
+                    {{
+                        strtoupper(
+                            substr(
+                                $authenticatedUser->name,
+                                0,
+                                1
+                            )
+                        )
+                    }}
+                </div>
+
+                <div class="sikerja-user-information">
+                    <strong>
+                        {{ $authenticatedUser->name }}
+                    </strong>
+
+                    <small>
+                        {{
+                            $authenticatedUser->role?->name
+                            ?? '-'
+                        }}
+                    </small>
+                </div>
+            </div>
+
+            <form
+                method="POST"
+                action="{{ route('logout') }}"
+                class="mt-3"
+            >
+                @csrf
+
+                <button
+                    type="submit"
+                    class="sikerja-logout-button"
+                >
+                    Keluar dari Sistem
+                </button>
+            </form>
         </div>
     </div>
-</nav>
-
-<main class="container py-4">
-    {{-- Pesan berhasil. --}}
-    @if (session('success'))
-        <div
-            class="alert alert-success alert-dismissible fade show"
-            role="alert"
-        >
-            {{ session('success') }}
-
-            <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="alert"
-                aria-label="Tutup"
-            ></button>
-        </div>
-    @endif
-
-    {{-- Pesan kesalahan umum. --}}
-    @if (session('error'))
-        <div
-            class="alert alert-danger alert-dismissible fade show"
-            role="alert"
-        >
-            {{ session('error') }}
-
-            <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="alert"
-                aria-label="Tutup"
-            ></button>
-        </div>
-    @endif
-
-    @yield('content')
-</main>
+</div>
 </body>
 </html>
