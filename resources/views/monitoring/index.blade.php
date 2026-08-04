@@ -21,15 +21,43 @@
             </p>
         </div>
 
-        @if ($selectedSchedule)
-            <span class="badge text-bg-primary fs-6">
-                {{
-                    $selectedSchedule
-                        ->wfh_date
-                        ->translatedFormat('d F Y')
-                }}
-            </span>
-        @endif
+       @if ($selectedSchedule)
+    <div class="d-flex flex-wrap align-items-center gap-2">
+        {{-- Informasi tanggal jadwal yang dipilih. --}}
+        <span class="badge text-bg-primary fs-6">
+            {{
+                $selectedSchedule
+                    ->wfh_date
+                    ->translatedFormat('d F Y')
+            }}
+        </span>
+
+        {{-- Tombol untuk mengunduh rekap PDF.
+             Filter halaman monitoring ikut diterapkan. --}}
+        <a
+            href="{{
+                route(
+                    $routePrefix . '.pdf',
+                    [
+                        'schedule_id' =>
+                            $selectedSchedule->id,
+
+                        'unit_id' =>
+                            $unitId ?: null,
+
+                        'search' =>
+                            $search !== ''
+                                ? $search
+                                : null,
+                    ]
+                )
+            }}"
+            class="btn btn-danger"
+        >
+            Ekspor Rekap PDF
+        </a>
+    </div>
+@endif
     </div>
 
     {{-- Filter --}}

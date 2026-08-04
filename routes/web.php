@@ -22,6 +22,7 @@ use App\Http\Controllers\Personnel\WorkItemController;
 use App\Http\Controllers\Personnel\WorkExecutionController;
 use App\Http\Controllers\Personnel\WorkReportController;
 use App\Http\Controllers\Personnel\CheckoutController;
+use App\Http\Controllers\MonitoringPdfController;
 use App\Http\Middleware\EnsurePasswordIsChanged;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -521,6 +522,48 @@ Route::middleware([
             ]
         )->name('files.download');
     });
+
+    /*
+|--------------------------------------------------------------------------
+| EKSPOR REKAP MONITORING PDF
+|--------------------------------------------------------------------------
+*/
+
+/*
+ * Ekspor PDF untuk Admin.
+ */
+Route::middleware([
+    'auth',
+    'active',
+    EnsurePasswordIsChanged::class,
+    'role:Admin',
+])
+    ->get(
+        '/admin/monitoring/pdf',
+        [
+            MonitoringPdfController::class,
+            'download',
+        ]
+    )
+    ->name('admin.monitoring.pdf');
+
+/*
+ * Ekspor PDF untuk Pimpinan.
+ */
+Route::middleware([
+    'auth',
+    'active',
+    EnsurePasswordIsChanged::class,
+    'role:Pimpinan',
+])
+    ->get(
+        '/pimpinan/monitoring/pdf',
+        [
+            MonitoringPdfController::class,
+            'download',
+        ]
+    )
+    ->name('leader.monitoring.pdf');
 
 /*
 |--------------------------------------------------------------------------
