@@ -123,4 +123,19 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+/*
+|--------------------------------------------------------------------------
+| Presentation Mode
+|--------------------------------------------------------------------------
+|
+| true  = aplikasi dapat didemokan di luar hari Jumat
+| false = aturan normal, jadwal hanya hari Jumat
+|
+*/
+
+'presentation_mode' => env(
+    'PRESENTATION_MODE',
+    false
+),
+
 ];

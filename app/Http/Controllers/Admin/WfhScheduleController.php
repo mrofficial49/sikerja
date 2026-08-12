@@ -153,16 +153,21 @@ class WfhScheduleController extends Controller
             'Asia/Jakarta'
         )->startOfDay();
 
-        /*
-         * Sesuai kebijakan SIKERJA, jadwal hanya boleh
-         * dibuat untuk hari Jumat.
-         */
-        if (! $wfhDate->isFriday()) {
-            throw ValidationException::withMessages([
-                'wfh_date' =>
-                    'Jadwal WFH hanya dapat dibuat pada hari Jumat.',
-            ]);
-        }
+       /*
+ * Dalam penggunaan normal, jadwal WFH hanya boleh
+ * dibuat untuk hari Jumat.
+ *
+ * Saat PRESENTATION_MODE aktif, pengecekan hari Jumat
+ * dilewati agar aplikasi dapat didemokan pada hari lain.
+ */
+if (
+    ! config('app.presentation_mode')
+    && ! $wfhDate->isFriday()
+) {
+    throw ValidationException::withMessages([
+        'wfh_date' =>
+            'Jadwal WFH hanya dapat dibuat pada hari Jumat.',
+    ]); }
 
         /*
          * Mencegah Admin membuat jadwal untuk tanggal lampau.
@@ -380,6 +385,48 @@ class WfhScheduleController extends Controller
             'status' => 'active',
             'activated_at' => now('Asia/Jakarta'),
         ]);
+        /*
+ * Setelah jadwal resmi diaktifkan, kirim notifikasi
+ * kepada seluruh Personel yang menjadi anggota jadwal.
+ *
+ * Notifikasi tidak dikirim saat status masih draft,
+ * karena Admin masih dapat memeriksa atau mengubah jadwal.
+ */
+$wfhSchedule->members()
+    ->where('member_status', '!=', 'cancelled')
+    ->with('user')
+    ->get()
+    ->each(function ($member) use ($wfhSchedule) {
+
+        /*
+         * Pastikan anggota masih memiliki akun user.
+         */
+        if (! $member->user) {
+            return;
+        }
+
+        AppNotification::create([
+            'user_id' => $member->user_id,
+
+            'type' => 'wfh_schedule',
+
+            'title' => 'Jadwal WFH Aktif',
+
+            'message' =>
+                'Anda dijadwalkan mengikuti WFH pada '
+                . $wfhSchedule->wfh_date
+                    ->translatedFormat('d F Y')
+                . '. Jadwal telah diaktifkan oleh Admin.',
+
+            'related_type' => WfhSchedule::class,
+
+            'related_id' => $wfhSchedule->id,
+
+            'is_read' => false,
+
+            'read_at' => null,
+        ]);
+    });
 
         $this->writeLog(
             $request,
