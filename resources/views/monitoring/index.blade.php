@@ -311,49 +311,135 @@
 
                     <tbody>
                         @forelse ($members as $member)
-                            @php
-                                $person = $member->user;
-                                $attendance = $member->attendance;
-                                $report = $member->workReport;
+    @php
+        $person = $member->user;
+        $attendance = $member->attendance;
+        $report = $member->workReport;
 
-                                $reportClass = match (
-                                    $report?->status
-                                ) {
-                                    'waiting_verification' =>
-                                        'warning',
+        /*
+         * Mengambil seluruh pekerjaan milik laporan.
+         *
+         * Jika laporan belum ada, gunakan collection kosong
+         * agar halaman Monitoring tidak error.
+         */
+        $workItems = $report?->items ?? collect();
 
-                                    'needs_revision' =>
-                                        'danger',
+        /*
+         * Pekerjaan cancelled tetap menjadi histori,
+         * tetapi tidak dihitung sebagai pekerjaan aktif.
+         */
+        $activeWorkItems = $workItems->where(
+            'status',
+            '!=',
+            'cancelled'
+        );
 
-                                    'approved' =>
-                                        'success',
+        /*
+         * Menghitung pekerjaan Belum Dimulai.
+         *
+         * Pekerjaan yang ditandai continue_offline
+         * akan dihitung sebagai Dilanjutkan Offline,
+         * sehingga tidak dihitung dua kali.
+         */
+        $notStartedCount = $activeWorkItems
+            ->where('status', 'not_started')
+            ->where('continue_offline', false)
+            ->count();
 
-                                    default =>
-                                        'secondary',
-                                };
+        /*
+         * Menghitung pekerjaan Sedang Dikerjakan.
+         */
+        $inProgressCount = $activeWorkItems
+            ->where('status', 'in_progress')
+            ->where('continue_offline', false)
+            ->count();
 
-                                $reportLabel = match (
-                                    $report?->status
-                                ) {
-                                    'draft' =>
-                                        'Draft',
+        /*
+         * Menghitung pekerjaan Terkendala.
+         */
+        $blockedCount = $activeWorkItems
+            ->where('status', 'blocked')
+            ->where('continue_offline', false)
+            ->count();
 
-                                    'waiting_verification' =>
-                                        'Menunggu Verifikasi',
+        /*
+         * Menghitung pekerjaan yang sudah selesai.
+         */
+        $completedCount = $activeWorkItems
+            ->where('status', 'completed')
+            ->count();
 
-                                    'needs_revision' =>
-                                        'Perlu Revisi',
+        /*
+         * Menghitung pekerjaan yang belum selesai,
+         * tetapi akan diteruskan secara offline.
+         */
+        $offlineCount = $activeWorkItems
+            ->filter(function ($item) {
+                return $item->continue_offline
+                    && ! in_array(
+                        $item->status,
+                        [
+                            'completed',
+                            'cancelled',
+                        ],
+                        true
+                    );
+            })
+            ->count();
 
-                                    'approved' =>
-                                        'Disetujui',
+        /*
+         * Menghitung pekerjaan yang dibatalkan.
+         * Tetap ditampilkan sebagai histori.
+         */
+        $cancelledCount = $workItems
+            ->where('status', 'cancelled')
+            ->count();
 
-                                    'incomplete' =>
-                                        'Belum Lengkap',
+        $reportClass = match (
+            $report?->status
+        ) {
+            'waiting_verification' =>
+                'warning',
 
-                                    default =>
-                                        'Belum Ada Laporan',
-                                };
-                            @endphp
+            'needs_revision' =>
+                'danger',
+
+            'approved' =>
+                'success',
+
+            'completed_offline' =>
+                'info',
+
+            default =>
+                'secondary',
+        };
+
+        $reportLabel = match (
+            $report?->status
+        ) {
+            'draft' =>
+                'Draft',
+
+            'waiting_verification' =>
+                'Menunggu Verifikasi',
+
+            'needs_revision' =>
+                'Perlu Revisi',
+
+            'approved' =>
+                'Disetujui',
+
+            'incomplete' =>
+                'Belum Lengkap',
+
+            'completed_offline' =>
+                'Selesai Offline',
+
+            default =>
+                'Belum Ada Laporan',
+        };
+    @endphp
+
 
                             <tr>
                                 <td class="px-4">
@@ -417,13 +503,75 @@
                                     @endif
                                 </td>
 
-                                <td>
-                                    {{
-                                        $report?->items_count
-                                        ?? 0
-                                    }}
-                                    pekerjaan
-                                </td>
+                               <td style="min-width: 210px;">
+    {{-- Jumlah seluruh pekerjaan --}}
+    <div class="fw-semibold mb-2">
+        {{ $workItems->count() }}
+        pekerjaan
+    </div>
+
+    @if ($workItems->isEmpty())
+
+        <span class="badge text-bg-secondary">
+            Belum Ada Pekerjaan
+        </span>
+
+    @else
+
+        <div class="d-flex flex-wrap gap-1">
+
+            {{-- Pekerjaan selesai --}}
+            @if ($completedCount > 0)
+                <span class="badge text-bg-success">
+                    {{ $completedCount }}
+                    Selesai
+                </span>
+            @endif
+
+            {{-- Sedang dikerjakan --}}
+            @if ($inProgressCount > 0)
+                <span class="badge text-bg-primary">
+                    {{ $inProgressCount }}
+                    Dikerjakan
+                </span>
+            @endif
+
+            {{-- Terkendala --}}
+            @if ($blockedCount > 0)
+                <span class="badge text-bg-danger">
+                    {{ $blockedCount }}
+                    Terkendala
+                </span>
+            @endif
+
+            {{-- Belum dimulai --}}
+            @if ($notStartedCount > 0)
+                <span class="badge text-bg-warning">
+                    {{ $notStartedCount }}
+                    Belum Dimulai
+                </span>
+            @endif
+
+            {{-- Dilanjutkan di luar sesi WFH --}}
+            @if ($offlineCount > 0)
+                <span class="badge text-bg-info">
+                    {{ $offlineCount }}
+                    Dilanjutkan Offline
+                </span>
+            @endif
+
+            {{-- Histori pekerjaan dibatalkan --}}
+            @if ($cancelledCount > 0)
+                <span class="badge text-bg-secondary">
+                    {{ $cancelledCount }}
+                    Dibatalkan
+                </span>
+            @endif
+
+        </div>
+
+    @endif
+</td>
 
                                 <td>
                                     <span

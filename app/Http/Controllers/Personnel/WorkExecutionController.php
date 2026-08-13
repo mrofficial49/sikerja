@@ -210,6 +210,39 @@ class WorkExecutionController extends Controller
         }
 
         /*
+ * Status Terkendala dan Selesai wajib mempunyai
+ * minimal satu bukti pekerjaan PDF yang masih tersedia.
+ *
+ * File dianggap tersedia apabila:
+ * - dimiliki oleh pekerjaan ini,
+ * - is_available = true,
+ * - belum ditandai deleted_at.
+ */
+if (
+    in_array(
+        $validated['status'],
+        [
+            'blocked',
+            'completed',
+        ],
+        true
+    )
+) {
+    $hasAvailablePdf = WorkItemFile::query()
+        ->where('item_id', $workItem->id)
+        ->where('is_available', true)
+        ->whereNull('deleted_at')
+        ->exists();
+
+    if (! $hasAvailablePdf) {
+        throw ValidationException::withMessages([
+            'status' =>
+                'Status Terkendala atau Selesai wajib memiliki minimal satu bukti pekerjaan PDF. Unggah PDF terlebih dahulu.',
+        ]);
+    }
+}
+
+        /*
          * Jika pekerjaan akan diteruskan secara offline,
          * rencana tindak lanjut wajib diisi.
          */
@@ -639,13 +672,56 @@ class WorkExecutionController extends Controller
         }
 
         if (! $workItemFile->is_available) {
-            return back()->with(
-                'error',
-                'File bukti sudah tidak tersedia.'
-            );
-        }
+    return back()->with(
+        'error',
+        'File bukti sudah tidak tersedia.'
+    );
+}
 
-        $validated = $request->validate([
+/*
+ * Pekerjaan berstatus Terkendala atau Selesai
+ * wajib mempunyai minimal satu bukti PDF.
+ *
+ * Karena itu, PDF terakhir tidak boleh dihapus
+ * selama pekerjaan masih menggunakan salah satu
+ * dari dua status tersebut.
+ */
+if (
+    in_array(
+        $workItem->status,
+        [
+            'blocked',
+            'completed',
+        ],
+        true
+    )
+) {
+    /*
+     * Hitung file PDF lain yang masih tersedia.
+     *
+     * File yang sedang akan dihapus dikecualikan
+     * menggunakan whereKeyNot().
+     */
+    $remainingAvailablePdfCount = WorkItemFile::query()
+        ->where('item_id', $workItem->id)
+        ->where('is_available', true)
+        ->whereNull('deleted_at')
+        ->whereKeyNot($workItemFile->id)
+        ->count();
+
+    /*
+     * Jika tidak ada PDF lain, berarti file ini
+     * merupakan bukti PDF terakhir.
+     */
+    if ($remainingAvailablePdfCount < 1) {
+        return back()->with(
+            'error',
+            'PDF terakhir tidak dapat dihapus karena pekerjaan berstatus Terkendala atau Selesai. Unggah PDF pengganti terlebih dahulu.'
+        );
+    }
+}
+
+$validated = $request->validate([
             'change_reason' => [
                 $report->status !== 'draft'
                     ? 'required'

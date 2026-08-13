@@ -187,7 +187,17 @@
                         </a>
                     </div>
 
-                    @if ($canModify)
+                    @if (
+    $canModify
+    && ! in_array(
+        $plan->status,
+        [
+            'completed',
+            'cancelled',
+        ],
+        true
+    )
+)
                         <div
                             class="d-flex flex-row flex-lg-column
                                    align-items-start gap-2"

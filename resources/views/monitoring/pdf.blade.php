@@ -239,6 +239,111 @@
             text-align: center;
         }
 
+/*
+ * =========================================================
+ * RINCIAN HASIL KINERJA
+ * =========================================================
+ */
+
+.detail-section {
+    page-break-before: always;
+    margin-top: 5px;
+}
+
+.detail-section-title {
+    margin: 0 0 12px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid #173b2b;
+    color: #173b2b;
+    font-size: 14px;
+    text-align: center;
+}
+
+.person-detail {
+    margin-bottom: 18px;
+}
+
+.person-detail-header {
+    padding: 7px 9px;
+    color: #ffffff;
+    background: #204d38;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.person-information {
+    width: 100%;
+    margin-bottom: 10px;
+    border-collapse: collapse;
+}
+
+.person-information td {
+    padding: 3px 5px;
+    vertical-align: top;
+}
+
+.person-information-label {
+    width: 110px;
+    color: #59675f;
+    font-weight: bold;
+}
+
+.person-information-separator {
+    width: 8px;
+}
+
+.detail-work-item {
+    margin-bottom: 12px;
+    padding: 9px;
+    border: 1px solid #cbd6cf;
+    background: #ffffff;
+    page-break-inside: avoid;
+}
+
+.detail-work-title {
+    margin-bottom: 7px;
+    color: #173b2b;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.detail-meta-table {
+    width: 100%;
+    margin-bottom: 8px;
+    border-collapse: collapse;
+}
+
+.detail-meta-table td {
+    padding: 2px 4px;
+    vertical-align: top;
+}
+
+.detail-meta-label {
+    width: 120px;
+    font-weight: bold;
+}
+
+.detail-meta-separator {
+    width: 8px;
+}
+
+.detail-field {
+    margin-bottom: 8px;
+}
+
+.detail-field-label {
+    margin-bottom: 2px;
+    color: #59675f;
+    font-weight: bold;
+}
+
+.offline-note {
+    margin-top: 8px;
+    padding: 7px;
+    border: 1px solid #d0aa55;
+    background: #fff9e8;
+}
+
         .signature-table {
             width: 100%;
             margin-top: 22px;
@@ -472,7 +577,9 @@
                 <th class="column-personnel">Personel</th>
                 <th class="column-unit">Unit/Jabatan</th>
                 <th class="column-attendance">Presensi</th>
-                <th class="column-work">Hasil Kinerja</th>
+                <th class="column-work">
+    Ringkasan Kinerja
+</th>
                 <th class="column-report">Status Laporan</th>
             </tr>
         </thead>
@@ -483,7 +590,43 @@
                     $person = $member->user;
                     $attendance = $member->attendance;
                     $report = $member->workReport;
+                    $workItems = $report?->items ?? collect();
 
+$activeWorkItems = $workItems->where(
+    'status',
+    '!=',
+    'cancelled'
+);
+
+$completedCount = $activeWorkItems
+    ->where('status', 'completed')
+    ->count();
+
+$offlineCount = $activeWorkItems
+    ->filter(function ($item) {
+        return $item->continue_offline
+            && ! in_array(
+                $item->status,
+                ['completed', 'cancelled'],
+                true
+            );
+    })
+    ->count();
+
+$inProgressCount = $activeWorkItems
+    ->where('status', 'in_progress')
+    ->where('continue_offline', false)
+    ->count();
+
+$blockedCount = $activeWorkItems
+    ->where('status', 'blocked')
+    ->where('continue_offline', false)
+    ->count();
+
+$notStartedCount = $activeWorkItems
+    ->where('status', 'not_started')
+    ->where('continue_offline', false)
+    ->count();
                     $reportLabel = match (
                         $report?->status
                     ) {
@@ -503,7 +646,7 @@
                             'Belum Lengkap',
 
                         'completed_offline' =>
-                            'Selesai Luring',
+                            'Selesai Offline',
 
                         default =>
                             'Belum Ada Laporan',
@@ -577,83 +720,67 @@
                         }}
                     </td>
 
-                    <td>
-                        @forelse (
-                            $report?->items ?? collect()
-                            as $item
-                        )
-                            @php
-                                $itemStatusLabel = match (
-                                    $item->status
-                                ) {
-                                    'not_started' =>
-                                        'Belum Dimulai',
+                   <td>
+    <div class="work-title">
+        {{ $workItems->count() }}
+        Pekerjaan
+    </div>
 
-                                    'in_progress' =>
-                                        'Berlangsung',
+    <div
+        class="small-text"
+        style="margin-top: 5px;"
+    >
+        @if ($completedCount > 0)
+            <div>
+                Selesai:
+                <strong>
+                    {{ $completedCount }}
+                </strong>
+            </div>
+        @endif
 
-                                    'blocked' =>
-                                        'Terkendala',
+        @if ($inProgressCount > 0)
+            <div>
+                Sedang Dikerjakan:
+                <strong>
+                    {{ $inProgressCount }}
+                </strong>
+            </div>
+        @endif
 
-                                    'completed' =>
-                                        'Selesai',
+        @if ($blockedCount > 0)
+            <div>
+                Terkendala:
+                <strong>
+                    {{ $blockedCount }}
+                </strong>
+            </div>
+        @endif
 
-                                    'cancelled' =>
-                                        'Dibatalkan',
+        @if ($notStartedCount > 0)
+            <div>
+                Belum Dimulai:
+                <strong>
+                    {{ $notStartedCount }}
+                </strong>
+            </div>
+        @endif
 
-                                    default =>
-                                        ucfirst(
-                                            str_replace(
-                                                '_',
-                                                ' ',
-                                                $item->status
-                                            )
-                                        ),
-                                };
-                            @endphp
+        @if ($offlineCount > 0)
+            <div>
+                Dilanjutkan Offline:
+                <strong>
+                    {{ $offlineCount }}
+                </strong>
+            </div>
+        @endif
 
-                            <div class="work-item">
-                                <div class="work-title">
-                                    {{ $item->title }}
-                                </div>
+        @if ($workItems->isEmpty())
+            Belum ada pekerjaan.
+        @endif
+    </div>
+</td>
 
-                                <div class="small-text">
-                                    {{ $itemStatusLabel }}
-                                    ·
-                                    Progres
-                                    {{ $item->progress ?? 0 }}%
-                                </div>
-
-                                @if ($item->target_result)
-                                    <div class="small-text">
-                                        Target:
-                                        {{
-                                            \Illuminate\Support\Str::limit(
-                                                $item->target_result,
-                                                120
-                                            )
-                                        }}
-                                    </div>
-                                @endif
-
-                                @if ($item->obstacle)
-                                    <div class="small-text">
-                                        Kendala:
-                                        {{
-                                            \Illuminate\Support\Str::limit(
-                                                $item->obstacle,
-                                                100
-                                            )
-                                        }}
-                                    </div>
-                                @endif
-                            </div>
-                        @empty
-                            <span class="small-text">
-                                Belum ada pekerjaan.
-                            </span>
-                        @endforelse
-                    </td>
 
                     <td class="column-report">
                         <span
@@ -688,6 +815,454 @@
             @endforelse
         </tbody>
     </table>
+    {{-- ==================================================
+     RINCIAN HASIL KINERJA PERSONEL
+=================================================== --}}
+
+<div class="detail-section">
+
+    <h2 class="detail-section-title">
+        RINCIAN HASIL KINERJA PERSONEL
+    </h2>
+
+    @forelse ($members as $member)
+
+        @php
+            $person = $member->user;
+            $attendance = $member->attendance;
+            $report = $member->workReport;
+
+            $reportLabel = match (
+                $report?->status
+            ) {
+                'draft' =>
+                    'Draft',
+
+                'waiting_verification' =>
+                    'Menunggu Verifikasi',
+
+                'needs_revision' =>
+                    'Perlu Revisi',
+
+                'approved' =>
+                    'Disetujui',
+
+                'incomplete' =>
+                    'Belum Lengkap',
+
+                'completed_offline' =>
+                    'Selesai Offline',
+
+                default =>
+                    'Belum Ada Laporan',
+            };
+        @endphp
+
+        <div class="person-detail">
+
+            {{-- ===========================================
+                 IDENTITAS PERSONEL
+            ============================================ --}}
+
+            <div class="person-detail-header">
+                PERSONEL {{ $loop->iteration }}
+                —
+                {{ strtoupper($person?->name ?? '-') }}
+            </div>
+
+            <table class="person-information">
+                <tr>
+                    <td class="person-information-label">
+                        NRP/NIP
+                    </td>
+
+                    <td class="person-information-separator">
+                        :
+                    </td>
+
+                    <td>
+                        {{ $person?->login_id ?? '-' }}
+                    </td>
+
+                    <td class="person-information-label">
+                        Pangkat
+                    </td>
+
+                    <td class="person-information-separator">
+                        :
+                    </td>
+
+                    <td>
+                        {{ $person?->rank ?? '-' }}
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="person-information-label">
+                        Jabatan
+                    </td>
+
+                    <td class="person-information-separator">
+                        :
+                    </td>
+
+                    <td>
+                        {{ $person?->position ?? '-' }}
+                    </td>
+
+                    <td class="person-information-label">
+                        Unit
+                    </td>
+
+                    <td class="person-information-separator">
+                        :
+                    </td>
+
+                    <td>
+                        {{ $person?->unit?->name ?? '-' }}
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="person-information-label">
+                        Check-in
+                    </td>
+
+                    <td class="person-information-separator">
+                        :
+                    </td>
+
+                    <td>
+                        {{
+                            $attendance?->checkin_at
+                                ?->format('H:i')
+                            ?? 'Belum'
+                        }}
+                        WIB
+                    </td>
+
+                    <td class="person-information-label">
+                        Check-out
+                    </td>
+
+                    <td class="person-information-separator">
+                        :
+                    </td>
+
+                    <td>
+                        {{
+                            $attendance?->checkout_at
+                                ?->format('H:i')
+                            ?? 'Belum'
+                        }}
+                        WIB
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="person-information-label">
+                        Status Laporan
+                    </td>
+
+                    <td class="person-information-separator">
+                        :
+                    </td>
+
+                    <td colspan="4">
+                        {{ $reportLabel }}
+                    </td>
+                </tr>
+            </table>
+
+
+            {{-- ===========================================
+                 PEKERJAAN
+            ============================================ --}}
+
+            @forelse (
+                $report?->items ?? collect()
+                as $item
+            )
+
+                @php
+                    /*
+                     * Label status pekerjaan.
+                     */
+                    $itemStatusLabel = match (
+                        $item->status
+                    ) {
+                        'not_started' =>
+                            'Belum Dimulai',
+
+                        'in_progress' =>
+                            'Sedang Dikerjakan',
+
+                        'blocked' =>
+                            'Terkendala',
+
+                        'completed' =>
+                            'Selesai',
+
+                        'cancelled' =>
+                            'Dibatalkan',
+
+                        default =>
+                            ucfirst(
+                                str_replace(
+                                    '_',
+                                    ' ',
+                                    $item->status
+                                )
+                            ),
+                    };
+
+                    /*
+                     * Asal pekerjaan.
+                     */
+                    $sourceLabel = match (
+                        $item->source_type
+                    ) {
+                        'personal_plan' =>
+                            'Rencana Kerja Pribadi',
+
+                        'leader_task' =>
+                            'Tugas Pimpinan',
+
+                        default =>
+                            '-',
+                    };
+
+                    /*
+                     * Cara penyelesaian pekerjaan.
+                     */
+                    $completionLabel =
+                        $item->continue_offline
+                            ? 'Dilanjutkan Secara Offline'
+                            : (
+                                $item->status === 'completed'
+                                    ? 'Selesai'
+                                    : (
+                                        $item->status === 'cancelled'
+                                            ? 'Dibatalkan'
+                                            : 'Masih Dalam Proses'
+                                    )
+                            );
+                @endphp
+
+                <div class="detail-work-item">
+
+                    <div class="detail-work-title">
+                        PEKERJAAN {{ $loop->iteration }}
+                        —
+                        {{ $item->title }}
+                    </div>
+
+                    <table class="detail-meta-table">
+                        <tr>
+                            <td class="detail-meta-label">
+                                Jenis Pekerjaan
+                            </td>
+
+                            <td class="detail-meta-separator">
+                                :
+                            </td>
+
+                            <td>
+                                {{ $sourceLabel }}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="detail-meta-label">
+                                Status Pekerjaan
+                            </td>
+
+                            <td class="detail-meta-separator">
+                                :
+                            </td>
+
+                            <td>
+                                {{ $itemStatusLabel }}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="detail-meta-label">
+                                Penyelesaian
+                            </td>
+
+                            <td class="detail-meta-separator">
+                                :
+                            </td>
+
+                            <td>
+                                {{ $completionLabel }}
+                            </td>
+                        </tr>
+                    </table>
+
+
+                    <div class="detail-field">
+                        <div class="detail-field-label">
+                            Uraian Pekerjaan
+                        </div>
+
+                        <div>
+                            @if (filled($item->description))
+                                {!! nl2br(e($item->description)) !!}
+                            @else
+                                -
+                            @endif
+                        </div>
+                    </div>
+
+
+                    <div class="detail-field">
+                        <div class="detail-field-label">
+                            Target Hasil
+                        </div>
+
+                        <div>
+                            @if (filled($item->target_result))
+                                {!! nl2br(e($item->target_result)) !!}
+                            @else
+                                -
+                            @endif
+                        </div>
+                    </div>
+
+
+                    <div class="detail-field">
+                        <div class="detail-field-label">
+                            Progres / Hasil Pelaksanaan
+                        </div>
+
+                        <div>
+                            @if (filled($item->progress))
+                                {!! nl2br(e($item->progress)) !!}
+                            @else
+                                Belum ada progres yang dilaporkan.
+                            @endif
+                        </div>
+                    </div>
+
+
+                    <div class="detail-field">
+                        <div class="detail-field-label">
+                            Kendala
+                        </div>
+
+                        <div>
+                            @if (filled($item->obstacle))
+                                {!! nl2br(e($item->obstacle)) !!}
+                            @else
+                                Tidak ada kendala yang dilaporkan.
+                            @endif
+                        </div>
+                    </div>
+
+
+                    <div class="detail-field">
+                        <div class="detail-field-label">
+                            Rencana Tindak Lanjut
+                        </div>
+
+                        <div>
+                            @if (filled($item->follow_up_plan))
+
+                                {!! nl2br(
+                                    e($item->follow_up_plan)
+                                ) !!}
+
+                            @elseif (
+                                $item->status === 'completed'
+                            )
+
+                                Pekerjaan telah selesai.
+
+                            @elseif (
+                                $item->status === 'cancelled'
+                            )
+
+                                Pekerjaan telah dibatalkan.
+
+                            @else
+
+                                Belum ada rencana tindak lanjut.
+
+                            @endif
+                        </div>
+                    </div>
+
+
+                    @if ($item->continue_offline)
+
+                        <div class="offline-note">
+
+                            <strong>
+                                Keterangan Penyelesaian
+                            </strong>
+
+                            <br>
+
+                            Pekerjaan belum selesai pada akhir
+                            sesi WFH dan akan dilanjutkan secara
+                            offline sesuai rencana tindak lanjut
+                            yang telah dicatat.
+
+                        </div>
+
+                    @endif
+
+                </div>
+
+            @empty
+
+                <div class="small-text">
+                    Belum ada pekerjaan yang dilaporkan.
+                </div>
+
+            @endforelse
+
+
+            {{-- ===========================================
+                 CATATAN VERIFIKASI
+            ============================================ --}}
+
+            @if (filled($report?->verification_note))
+
+                <div
+                    class="detail-field"
+                    style="
+                        margin-top: 8px;
+                        padding: 7px;
+                        border: 1px solid #cbd6cf;
+                    "
+                >
+                    <div class="detail-field-label">
+                        Catatan Verifikasi Pimpinan
+                    </div>
+
+                    <div>
+                        {!! nl2br(
+                            e($report->verification_note)
+                        ) !!}
+                    </div>
+                </div>
+
+            @endif
+
+        </div>
+
+    @empty
+
+        <div class="empty-data">
+            Belum terdapat data hasil kinerja Personel.
+        </div>
+
+    @endforelse
+
+</div>
 
     {{-- ==================================================
          KOLOM PENGESAHAN

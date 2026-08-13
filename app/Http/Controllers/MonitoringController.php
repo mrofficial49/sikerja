@@ -66,17 +66,30 @@ class MonitoringController extends Controller
          */
         $membersQuery = WfhScheduleMember::query()
             ->with([
-                'user.unit',
-                'schedule',
-                'attendance',
+    'user.unit',
+    'schedule',
+    'attendance',
 
-                /*
-                 * Menghitung jumlah pekerjaan pada laporan.
-                 */
-                'workReport' => function ($query) {
-                    $query->withCount('items');
+    /*
+     * Ambil laporan beserta seluruh rincian pekerjaan.
+     *
+     * withCount('items')
+     * digunakan untuk menghitung jumlah pekerjaan.
+     *
+     * with('items')
+     * digunakan supaya Monitoring dapat membaca
+     * status masing-masing pekerjaan.
+     */
+    'workReport' => function ($query) {
+        $query
+            ->withCount('items')
+            ->with([
+                'items' => function ($itemQuery) {
+                    $itemQuery->orderBy('id');
                 },
-            ])
+            ]);
+    },
+])
 
             /*
              * Personel yang dibatalkan tidak dimasukkan.

@@ -403,6 +403,38 @@ class WorkReportController extends Controller
         }
 
         /*
+ * Pekerjaan berstatus Terkendala atau Selesai
+ * wajib mempunyai minimal satu bukti PDF.
+ *
+ * Pemeriksaan ini menjadi lapisan keamanan kedua
+ * sebelum laporan dikirim kepada reviewer.
+ */
+if (
+    in_array(
+        $item->status,
+        [
+            'blocked',
+            'completed',
+        ],
+        true
+    )
+) {
+    $hasAvailablePdf = $item->files()
+        ->where('is_available', true)
+        ->whereNull('deleted_at')
+        ->exists();
+
+    if (! $hasAvailablePdf) {
+        throw ValidationException::withMessages([
+            'report' =>
+                'Pekerjaan "'
+                . $item->title
+                . '" berstatus Terkendala atau Selesai tetapi belum memiliki bukti PDF.',
+        ]);
+    }
+}
+
+        /*
          * Pekerjaan yang belum selesai wajib memiliki
          * rencana tindak lanjut.
          */

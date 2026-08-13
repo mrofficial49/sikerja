@@ -172,6 +172,21 @@
                         {{ $message }}
                     </div>
                 @enderror
+
+                <div class="form-text">
+    <strong>Catatan:</strong>
+    Status
+    <span class="text-danger">Terkendala</span>
+    atau
+    <span class="text-success">Selesai</span>
+    wajib memiliki minimal satu bukti pekerjaan PDF.
+    Unggah bukti pada bagian
+    <a href="#bukti-pekerjaan">
+        Bukti Pekerjaan
+    </a>
+    terlebih dahulu.
+</div>
+
             </div>
 
             <div class="mb-3">
@@ -328,7 +343,10 @@
 </div>
 
 <div class="card border-0 shadow-sm">
-    <div class="card-header bg-white py-3">
+    <div
+    id="bukti-pekerjaan"
+    class="card border-0 shadow-sm"
+>
         <h2 class="h5 fw-bold mb-1">
             Bukti Pekerjaan
         </h2>

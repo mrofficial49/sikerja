@@ -187,9 +187,22 @@ class WorkItemController extends Controller
         }
 
         $this->ensureOwnedPersonalPlan(
-            $report,
-            $workItem
+    $report,
+    $workItem
+);
+
+/*
+ * Rincian pekerjaan hanya boleh diedit
+ * selama pekerjaan belum selesai atau dibatalkan.
+ */
+if (! $this->workItemCanBeEdited($workItem)) {
+    return redirect()
+        ->route('personnel.work-items.index')
+        ->with(
+            'error',
+            'Rincian pekerjaan yang sudah selesai atau dibatalkan tidak dapat diedit.'
         );
+}
 
         return view('personnel.work-items.edit', [
             'report' => $report,
@@ -216,6 +229,22 @@ class WorkItemController extends Controller
             $report,
             $workItem
         );
+
+/*
+ * Pemeriksaan ini diulang pada proses update.
+ *
+ * Kenapa?
+ * Karena pengguna bisa saja mencoba mengirim request
+ * update secara langsung tanpa membuka form edit.
+ */
+if (! $this->workItemCanBeEdited($workItem)) {
+    return redirect()
+        ->route('personnel.work-items.index')
+        ->with(
+            'error',
+            'Rincian pekerjaan yang sudah selesai atau dibatalkan tidak dapat diedit.'
+        );
+}
 
         $validated = $request->validate(
             $this->validationRules($report),
@@ -496,6 +525,31 @@ class WorkItemController extends Controller
             );
         }
     }
+
+    /**
+ * Menentukan apakah rincian pekerjaan masih boleh diedit.
+ *
+ * Pekerjaan masih dapat diperbaiki selama status:
+ * - not_started
+ * - in_progress
+ * - blocked
+ *
+ * Pekerjaan dikunci apabila:
+ * - completed
+ * - cancelled
+ */
+private function workItemCanBeEdited(
+    WorkItem $workItem
+): bool {
+    return ! in_array(
+        $workItem->status,
+        [
+            'completed',
+            'cancelled',
+        ],
+        true
+    );
+}
 
     /**
      * Jika laporan pernah dikirim atau disetujui,
